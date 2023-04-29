@@ -9,17 +9,40 @@
 function BOOT() 
  x=96
  y=24
+ x_max = -1
+ y_max = -1
+ x_min = -1
+ y_min = -1
+ 
  dirShoot={}
  shPos={}
- 
- for i=1,100 do
+ sh_max = 100
+ for i=1,sh_max do
   dirShoot[i]={-1,-1}
   shPos[i]={-1,-1}
  end
-
 	sh_auto_delay=20
 	sh_auto_buf=0
  shoot=false
+ 
+ --weapons
+ xw1=200
+ yw1=50
+ 
+ xw2=100
+ yw2=100
+ 
+end
+
+function AABB(b1, b2)
+	if ((b2.bx >= b1.bx + b1.bw)
+	or (b2.bx + b2.bw <= b1.bx)
+	or (b2.by >= b1.by + b1.bh)
+	or (b2.by + b2.bh <= b1.by)) then
+		return false; 
+	else
+		return true;
+	end 
 end
 
 function draw_sprite(angle, px, py, size, color)
@@ -28,13 +51,25 @@ function draw_sprite(angle, px, py, size, color)
 	local pos_x_scl = px
 	local pos_y_scl = py
  
+ local a = pos_x_scl + size * math_cos(angle)
+ local b = pos_y_scl + size * math_sin(angle)
+ local c = pos_x_scl + size * math_cos(angle + size)
+ local d = pos_y_scl + size * math_sin(angle + size)
+ local e = pos_x_scl + size * math_cos(angle - size)
+	local f = pos_y_scl + size * math_sin(angle - size)
+	
+	x_max = math.max(a,c,e)
+	y_max = math.max(b,d,f)
+	x_min = math.min(a,c,e)
+	y_min = math.min(b,d,f)
+	
 	tri(
-		pos_x_scl + size * math_cos(angle),
-		pos_y_scl + size * math_sin(angle),
-		pos_x_scl + size * math_cos(angle + size),
-		pos_y_scl + size * math_sin(angle + size),
-		pos_x_scl + size * math_cos(angle - size),
-		pos_y_scl + size * math_sin(angle - size),
+		a,
+		b,
+		c,
+		d,
+		e,
+		f,
 		color
 	)
  end
@@ -65,10 +100,14 @@ function TIC()
   		i = i+1
   	end
   
-  	if i<100 then
+  	if i<sh_max then
   	 dirShoot[i] = norm({xmouse-x, ymouse-y})
   	 shPos[i] = {x, y}
   	 shoot = true
+    
+    -- recoil
+    	 x=x-dirShoot[i][1]
+      y=y-dirShoot[i][2]
   	end
   end
  end
@@ -91,7 +130,7 @@ function TIC()
 	print("x, y : "..xmouse..", "..ymouse,84,50)
 	print("angle : "..angle,84,84)
 	
-	for i=1,100 do
+	for i=1,sh_max do
 		if shPos[i][1] > 0 then
 			pix(shPos[i][1],shPos[i][2], 12)
 			shPos[i]={shPos[i][1]+ dirShoot[i][1],shPos[i][2]+ dirShoot[i][2]}
@@ -101,20 +140,51 @@ function TIC()
   end
  end
 	
-	pix(x, y, 12)
+	--pix(x, y, 12)
+	-- draw weapon
+	spr(1,xw1,yw1,0,1,0,0,1,1)
+	rectb(xw1, yw1, 8, 8, 2)
+	spr(2,xw2,yw2,0,1,0,0,1,1)
+	rectb(xw2, yw2, 8, 8, 2)
+	
+	bw1 = {
+ 	bx= xw1, 
+  by= yw1,
+  bw= 8, 
+  bh= 8 
+ }
+ 
+ bw2 = {
+ 	bx= xw2, 
+  by= yw2,
+  bw= 8, 
+  bh= 8 
+ }
+	
 	draw_sprite(math.pi + angleRad, x, y,10, 12)
-	--t=t+1
+	
+	w=x_max-x_min
+	h=y_max-y_min
+	
+	bp = {
+ 	bx= x, 
+  by= y,
+  bw= w, 
+  bh= h 
+ }
+ 
+ col = AABB(bp, bw1)
+ 
+ print("w1 : "..tostring(col),20,120)
+	
+ 
+	--mwh=math.max(w,h)
+	rectb(x_min, y_min, w, h, 2)
 end
 
 -- <TILES>
--- 001:eccccccccc888888caaaaaaaca888888cacccccccacc0ccccacc0ccccacc0ccc
--- 002:ccccceee8888cceeaaaa0cee888a0ceeccca0ccc0cca0c0c0cca0c0c0cca0c0c
--- 003:eccccccccc888888caaaaaaaca888888cacccccccacccccccacc0ccccacc0ccc
--- 004:ccccceee8888cceeaaaa0cee888a0ceeccca0cccccca0c0c0cca0c0c0cca0c0c
--- 017:cacccccccaaaaaaacaaacaaacaaaaccccaaaaaaac8888888cc000cccecccccec
--- 018:ccca00ccaaaa0ccecaaa0ceeaaaa0ceeaaaa0cee8888ccee000cceeecccceeee
--- 019:cacccccccaaaaaaacaaacaaacaaaaccccaaaaaaac8888888cc000cccecccccec
--- 020:ccca00ccaaaa0ccecaaa0ceeaaaa0ceeaaaa0cee8888ccee000cceeecccceeee
+-- 001:00000000000000c0cccccccccccccccccc0c0000cc000000cc000000cc000000
+-- 002:000000000000000000cccc0000c0000000c00000000000000000000000000000
 -- </TILES>
 
 -- <WAVES>
