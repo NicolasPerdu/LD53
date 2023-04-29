@@ -54,6 +54,12 @@ function BOOT()
  {bx=200,by=40,bw=8,bh=8},
  {bx=100,by=100,bw=10,bh=10}}
  
+ --enemies
+ en_enabled ={true, true, true}
+ bens = {{x1=0,y1=0,x2=10,y2=0,x3=5,y3=20},
+ {x1=180,y1=120,x2=187,y2=121,x3=195,y3=114},
+ {x1=30,y1=94,x2=12,y2=101,x3=18,y3=110}}
+ 
 end
 
 function AABB(b1, b2)
@@ -197,6 +203,7 @@ function TIC()
 	 
  rectb(x_min, y_min, w, h, 2)
 	
+	-- obstacles collision
 	for j=1,3 do
 	 if os_enabled[j] and AABB(bp, bos[j]) then
 	 	xp = x + vx
@@ -317,6 +324,15 @@ function TIC()
 	
 	tri(a,b,c,d,e,f,color)
  
+ for i=1,3 do 
+  tri(bens[i].x1,
+  bens[i].y1,
+  bens[i].x2,
+  bens[i].y2,
+  bens[i].x3,
+  bens[i].y3,
+  color)
+ end 
  
  
  -- collision with weapon 1
@@ -337,9 +353,9 @@ function TIC()
   end
  end 
  
- print("w1 : "..tostring(col_big),20,120)
-	print("res PO: "..tostring(resPO),20,80)
-	
+ --print("w1 : "..tostring(col_big),20,120)
+	--print("tri: "..a..", "..b..", "..c,20,60)
+	--print("tri: "..d..", "..e..", "..f,20,80)
  
 	--mwh=math.max(w,h)
 end
