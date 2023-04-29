@@ -55,10 +55,14 @@ function BOOT()
  {bx=100,by=100,bw=10,bh=10}}
  
  --enemies
- en_enabled ={true, true, true}
- bens = {{x1=0,y1=0,x2=10,y2=0,x3=5,y3=20},
- {x1=180,y1=120,x2=187,y2=121,x3=195,y3=114},
- {x1=30,y1=94,x2=12,y2=101,x3=18,y3=110}}
+ ens_enabled ={true, true, true}
+ --bens = {{x1=0,y1=0,x2=10,y2=0,x3=5,y3=20},
+ --{x1=180,y1=120,x2=187,y2=121,x3=195,y3=114},
+ --{x1=30,y1=94,x2=12,y2=101,x3=18,y3=110}}
+ en_pos = {{0, 0}, {180, 120}, {30, 94}}
+ en_box = {{bx=0,by=0,bw=8,bh=8},
+  {bx=180,by=120,bw=8,bh=8},
+  {bx=30,by=94,bw=8,bh=8}}
  
 end
 
@@ -108,6 +112,8 @@ function compute_sprite(angle, px, py, size, color)
  function clamp(n, low, high) return math.min(math.max(n, low), high) end
 
 function TIC()
+
+-- input system for the player
 	local xmouse,ymouse,left,middle,right,scrollx,scrolly=mouse()
 	
 	if btn(0) then vy=vy-0.2 end
@@ -200,6 +206,21 @@ function TIC()
   bw= w, 
   bh= h 
  }
+ 
+ -- input system for the enemy
+ speed_en = 0.2
+ for i=1,3 do
+ 	if ens_enabled[i] then
+ 	 dir = norm({x-en_pos[i][1], y-en_pos[i][2]})
+ 	 en_pos[i]= {en_pos[i][1]+ dir[1]*speed_en,en_pos[i][2]+ dir[2]*speed_en} 
+   en_box[i].bx=en_pos[i][1]
+   en_box[i].by=en_pos[i][2]
+  
+   if AABB(bp, en_box[i]) then
+			 -- collision enemy player 
+		 end
+		end
+ end
 	 
  rectb(x_min, y_min, w, h, 2)
 	
@@ -251,8 +272,20 @@ function TIC()
    
    for j=1,3 do
    if os_enabled[j] then
+    -- collision bullet obstacle
     if AABB(bb, bos[j]) then 
    	 os_enabled[j] = false
+     shPos[i] = {-1,-1}
+    end
+			 shPosBox[i]=bb
+			end
+			end
+			
+			for j=1,3 do
+			if ens_enabled[j] then
+    -- collision bullet enemies
+    if AABB(bb, en_box[j]) then 
+   	 ens_enabled[j] = false
      shPos[i] = {-1,-1}
     end 
 			 shPosBox[i]=bb
@@ -280,12 +313,24 @@ function TIC()
    
    for j=1,3 do
     if os_enabled[j] then
+    -- collision bullet obstacle
      if AABB(bb, bos[j]) then 
     	 os_enabled[j] = false
       shPosBig[i] = {-1,-1}
      end 
 			  shPosBigBox[i]=bb
 			 end
+			end
+			
+			for j=1,3 do
+			if ens_enabled[j] then
+    -- collision bullet enemies
+    if AABB(bb, en_box[j]) then 
+   	 ens_enabled[j] = false
+     shPosBig[i] = {-1,-1}
+    end 
+			 shPosBigBox[i]=bb
+			end
 			end
 			
 			rectb(bb.bx,bb.by,bb.bw,bb.bh, 2)
@@ -325,13 +370,22 @@ function TIC()
 	tri(a,b,c,d,e,f,color)
  
  for i=1,3 do 
-  tri(bens[i].x1,
-  bens[i].y1,
-  bens[i].x2,
-  bens[i].y2,
-  bens[i].x3,
-  bens[i].y3,
-  color)
+  --tri(bens[i].x1,
+  --bens[i].y1,
+  --bens[i].x2,
+  --bens[i].y2,
+  --bens[i].x3,
+  --bens[i].y3,
+  --color)
+  if ens_enabled[i] then
+   rectb(en_box[i].bx,
+  				 		en_box[i].by,
+  			 			en_box[i].bw,
+  		 				en_box[i].bh,
+         2
+   )
+   spr(3,en_pos[i][1],en_pos[i][2],0,1,0,0,1,1)
+  end
  end 
  
  
@@ -363,6 +417,7 @@ end
 -- <TILES>
 -- 001:00000000000000c0cccccccccccccccccc0c0000cc000000cc000000cc000000
 -- 002:000000000000000000cccc0000c0000000c00000000000000000000000000000
+-- 003:0003000000333300333333333331333303313133033131330333333000333330
 -- </TILES>
 
 -- <WAVES>
