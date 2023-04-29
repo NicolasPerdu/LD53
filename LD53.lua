@@ -100,11 +100,11 @@ end
 function render_sky()
 	for i=0,240 do
 		for j=0,136 do
-			if mp[i+mx*8] then
+			if mp[i] then
 				if cntSky==0 then
-			  pix(i,j,mp[i+mx*8][j]+8)
+			  pix(i,j,mp[i][j]+8)
 				else
-					pix(i-1,j,mp[i+mx*8][j]+8)
+					pix(i-1,j,mp[i][j]+8)
 				end
 			end
 		end 
@@ -173,6 +173,42 @@ function perlin(i, j)
 end
 
 -- PERLIN NOISE FUNCTION END
+
+function transition_map()
+	-- begin of the level
+	if mx==0 and x<0 and my==0 then
+		x=0
+	end
+
+	-- end of the map right
+	if x>=240 then
+		x=0
+		mx=mx+30
+	end
+
+	-- end of the map bottom
+	if y>=136 then
+ 		y=0
+		my=my+18
+	end
+
+	-- end of the map top
+	if y<0 then
+ 		y=136
+		my=my-18
+	end
+
+	-- come back to the previous map
+	if mx>0 and x<0 then
+		x=240
+		mx=mx-30
+	end 
+
+	if mx==0 and x<0 and my>0 then
+		x=240
+		my=my-18
+	end
+end 
 
 function AABB(b1, b2)
 	if ((b2.bx >= b1.bx + b1.bw)
@@ -294,6 +330,8 @@ function TIC()
  		sh_auto_buf = sh_auto_buf+1
   end
  end
+ 
+ transition_map()
 
 	cls(13)
 	render_sky()
