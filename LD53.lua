@@ -51,12 +51,14 @@ function BOOT()
  w2_enabled=true
  
  --obstacle
+ num_os=3
  os_enabled ={true, true, true}
  bos = {{bx=20,by=20,bw=28,bh=28},
  {bx=200,by=40,bw=8,bh=8},
  {bx=100,by=100,bw=10,bh=10}}
  
  --enemies
+ num_en=3
  ens_enabled ={true, true, true}
  --bens = {{x1=0,y1=0,x2=10,y2=0,x3=5,y3=20},
  --{x1=180,y1=120,x2=187,y2=121,x3=195,y3=114},
@@ -67,6 +69,7 @@ function BOOT()
   {bx=30,by=94,bw=8,bh=8}}
   
   -- jewel to pick up
+  num_jw = 3
   jw_enabled ={true, true, true}
   jw_pos = {{20, 50}, {30, 60}, {40, 80}}
   jw_box = {{bx=20,by=50,bw=8,bh=8},
@@ -315,7 +318,7 @@ function TIC()
  
  -- input system for the enemy
  speed_en = 0.2
- for i=1,3 do
+ for i=1,num_en do
  	if ens_enabled[i] then
  	 dir = norm({x-en_pos[i][1], y-en_pos[i][2]})
  	 en_pos[i]= {en_pos[i][1]+ dir[1]*speed_en,en_pos[i][2]+ dir[2]*speed_en} 
@@ -329,7 +332,7 @@ function TIC()
  end
  
  -- collision with jewel
- for i=1,3 do
+ for i=1,num_jw do
  	if jw_enabled[i] then
    if AABB(bp, jw_box[i]) then
 			 jw_enabled[i]=false 
@@ -340,7 +343,7 @@ function TIC()
  rectb(x_min, y_min, w, h, 2)
 	
 	-- obstacles collision
-	for j=1,3 do
+	for j=1,num_os do
 	 if os_enabled[j] and AABB(bp, bos[j]) then
 	 	xp = x + vx
  	 yp = y + vy
@@ -368,7 +371,7 @@ function TIC()
 	y = y + vy
 	 
 	-- render obstacle
-	for j=1,3 do
+	for j=1,num_os do
 	 if os_enabled[j] then
    rect(bos[j].bx,bos[j].by,bos[j].bw,bos[j].bh,2)
 	 end
@@ -385,7 +388,7 @@ function TIC()
     bh= 2 
    }
    
-   for j=1,3 do
+   for j=1,num_os do
    if os_enabled[j] then
     -- collision bullet obstacle
     if AABB(bb, bos[j]) then 
@@ -396,7 +399,7 @@ function TIC()
 			end
 			end
 			
-			for j=1,3 do
+			for j=1,num_en do
 			if ens_enabled[j] then
     -- collision bullet enemies
     if AABB(bb, en_box[j]) then 
@@ -426,7 +429,7 @@ function TIC()
     bh= 11 
    }
    
-   for j=1,3 do
+   for j=1,num_os do
     if os_enabled[j] then
     -- collision bullet obstacle
      if AABB(bb, bos[j]) then 
@@ -437,7 +440,7 @@ function TIC()
 			 end
 			end
 			
-			for j=1,3 do
+			for j=1,num_en do
 			if ens_enabled[j] then
     -- collision bullet enemies
     if AABB(bb, en_box[j]) then 
@@ -482,7 +485,7 @@ function TIC()
   bh= 8 
  }
  
- for i=1,3 do
+ for i=1,num_jw do
  if jw_enabled[i] then
    rectb(jw_box[i].bx,
   				 		jw_box[i].by,
@@ -497,7 +500,7 @@ function TIC()
 	tri(a,b,c,d,e,f,color)
  
  -- render the enemies
- for i=1,3 do 
+ for i=1,num_en do 
   --tri(bens[i].x1,
   --bens[i].y1,
   --bens[i].x2,
