@@ -9,6 +9,8 @@
 function BOOT() 
  x=96
  y=24
+ vx=0
+ vy=0
  x_max = -1
  y_max = -1
  x_min = -1
@@ -84,14 +86,40 @@ function draw_sprite(angle, px, py, size, color)
   vec[2] = vec[2]/mag
   return vec
  end
+ 
+ function clamp(n, low, high) return math.min(math.max(n, low), high) end
 
 function TIC()
 	local xmouse,ymouse,left,middle,right,scrollx,scrolly=mouse()
 	
-	if btn(0) then y=y-1 end
-	if btn(1) then y=y+1 end
-	if btn(2) then x=x-1 end
-	if btn(3) then x=x+1 end
+	if btn(0) then vy=vy-0.2 end
+	if btn(1) then vy=vy+0.2 end
+	if btn(2) then vx=vx-0.2 end
+	if btn(3) then vx=vx+0.2 end
+	
+	if not btn(0) 
+		and not btn(1)
+		and not btn(2)
+		and not btn(3) then 
+		cst = 0.05
+		if vx>0 then
+		 vx = math.max(0, vx - cst)
+		else
+			vx = math.min(0, vx + cst)
+		end
+		
+		if vy>0 then
+			vy = math.max(0, vy - cst)
+		else 
+		 vy = math.min(0, vy + cst)
+		end
+	end
+		
+	vx = clamp(vx, -1, 1)
+	vy = clamp(vy, -1, 1)
+	
+	x = x + vx
+	y = y + vy
 	
  if left then
  	if not shoot then
