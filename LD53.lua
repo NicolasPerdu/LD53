@@ -65,7 +65,14 @@ function BOOT()
  en_box = {{bx=0,by=0,bw=8,bh=8},
   {bx=180,by=120,bw=8,bh=8},
   {bx=30,by=94,bw=8,bh=8}}
- 
+  
+  -- jewel to pick up
+  jw_enabled ={true, true, true}
+  jw_pos = {{20, 50}, {30, 60}, {40, 80}}
+  jw_box = {{bx=20,by=50,bw=8,bh=8},
+  {bx=30,by=60,bw=8,bh=8},
+  {bx=40,by=80,bw=8,bh=8}}
+  
   -- PERLIN NOISE
  cntSky=0
 	bufferSky=1
@@ -320,6 +327,15 @@ function TIC()
 		 end
 		end
  end
+ 
+ -- collision with jewel
+ for i=1,3 do
+ 	if jw_enabled[i] then
+   if AABB(bp, jw_box[i]) then
+			 jw_enabled[i]=false 
+		 end
+		end
+ end
 	 
  rectb(x_min, y_min, w, h, 2)
 	
@@ -465,9 +481,22 @@ function TIC()
   bw= 8, 
   bh= 8 
  }
+ 
+ for i=1,3 do
+ if jw_enabled[i] then
+   rectb(jw_box[i].bx,
+  				 		jw_box[i].by,
+  			 			jw_box[i].bw,
+  		 				jw_box[i].bh,
+         2
+   )
+   spr(4,jw_pos[i][1],jw_pos[i][2],0,1,0,0,1,1)
+  end
+ end
 	
 	tri(a,b,c,d,e,f,color)
  
+ -- render the enemies
  for i=1,3 do 
   --tri(bens[i].x1,
   --bens[i].y1,
@@ -517,6 +546,7 @@ end
 -- 001:00000000000000c0cccccccccccccccccc0c0000cc000000cc000000cc000000
 -- 002:000000000000000000cccc0000c0000000c00000000000000000000000000000
 -- 003:0003000000333300333333333331333303313133033131330333333000333330
+-- 004:0000000000444400044c444004cc444004444440044444400044440000000000
 -- </TILES>
 
 -- <WAVES>
