@@ -6,21 +6,48 @@
 -- version: 0.1
 -- script:  lua
 
-t=0
-x=96
-y=24
+--t=0
+--x=96
+--y=24
+
+function draw_sprite(angle, px, py, size, color)
+	local math_cos = math.cos
+	local math_sin = math.sin
+	local pos_x_scl = px
+	local pos_y_scl = py
+ 
+	tri(
+		pos_x_scl + size * math_cos(angle),
+		pos_y_scl + size * math_sin(angle),
+		pos_x_scl + size * math_cos(angle + size),
+		pos_y_scl + size * math_sin(angle + size),
+		pos_x_scl + size * math_cos(angle - size),
+		pos_y_scl + size * math_sin(angle - size),
+		color
+	)
+ end
 
 function TIC()
 
-	if btn(0) then y=y-1 end
-	if btn(1) then y=y+1 end
-	if btn(2) then x=x-1 end
-	if btn(3) then x=x+1 end
+	--if btn(0) then y=y-1 end
+	--if btn(1) then y=y+1 end
+	--if btn(2) then x=x-1 end
+	--if btn(3) then x=x+1 end
 
 	cls(13)
-	spr(1+t%60//30*2,x,y,14,3,0,0,2,2)
-	print("HELLO WORLD!",84,84)
-	t=t+1
+ --spr(1+t%60//30*2,x,y,14,3,0,0,2,2)
+	--print("HELLO WORLD!",84,84)
+	
+	local x,y,left,middle,right,scrollx,scrolly=mouse()
+	
+	angleRad = math.atan2(68-y,120-x)
+	angle = (angleRad * 180 / math.pi + 360) %360
+	print("x, y : "..x..", "..y,84,50)
+	print("angle : "..angle,84,84)
+	
+	pix(120, 68, 12)
+	draw_sprite(math.pi + angleRad, 120, 68,10, 12)
+	--t=t+1
 end
 
 -- <TILES>
