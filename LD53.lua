@@ -1,5 +1,5 @@
 -- title:   game title
--- author:  game developer, email, etc.
+-- author:  Nicolqs & Jake
 -- desc:    short description
 -- site:    website link
 -- license: MIT License (change this to your license of choice)
@@ -11,21 +11,26 @@ function BOOT()
  y=24
  vx=0
  vy=0
- x_max = -1
- y_max = -1
- x_min = -1
- y_min = -1
+ x_max=-1
+ y_max=-1
+ x_min=-1
+ y_min=-1
  
  dirShoot={}
  shPos={}
+ dirShootBig={}
+ shPosBig={}
  sh_max = 100
  for i=1,sh_max do
   dirShoot[i]={-1,-1}
   shPos[i]={-1,-1}
+  dirShootBig[i]={-1,-1}
+  shPosBig[i]={-1,-1}
  end
 	sh_auto_delay=20
 	sh_auto_buf=0
  shoot=false
+ sh_type=2
  
  --weapons
  xw1=200
@@ -33,6 +38,9 @@ function BOOT()
  
  xw2=100
  yw2=100
+ 
+ w1_enabled=true
+ w2_enabled=true
  
 end
 
@@ -124,18 +132,35 @@ function TIC()
  if left then
  	if not shoot then
   	i = 1
-  	while (shPos[i][1]>0) do
-  		i = i+1
-  	end
+   if sh_type==2 then 
+  	 while (shPos[i][1]>0) do
+  		 i = i+1
+  	 end
+   elseif sh_type==1 then
+    while (shPosBig[i][1]>0) do
+  		 i = i+1
+  	 end
+   end 
   
   	if i<sh_max then
-  	 dirShoot[i] = norm({xmouse-x, ymouse-y})
-  	 shPos[i] = {x, y}
-  	 shoot = true
+  	 if sh_type==2 then 
+     dirShoot[i] = norm({xmouse-x, ymouse-y})
+  	  shPos[i] = {x, y}
+  	  shoot = true
     
-    -- recoil
-    	 x=x-dirShoot[i][1]
-      y=y-dirShoot[i][2]
+     -- recoil
+     x=x-dirShoot[i][1]
+     y=y-dirShoot[i][2]
+    elseif sh_type==1 then
+     dirShootBig[i] = norm({xmouse-x, ymouse-y})
+  	  shPosBig[i] = {x, y}
+  	  shoot = true
+    
+     -- recoil
+     recoil=2
+     x=x-dirShootBig[i][1]*recoil
+     y=y-dirShootBig[i][2]*recoil
+    end
   	end
   end
  end
@@ -167,13 +192,28 @@ function TIC()
    end
   end
  end
+ 
+ for i=1,sh_max do
+		if shPosBig[i][1] > 0 then
+			circ(shPosBig[i][1],shPosBig[i][2],5, 12)
+			shPosBig[i]={shPosBig[i][1]+ dirShootBig[i][1],shPosBig[i][2]+ dirShootBig[i][2]}
+ 	 if shPosBig[i][1]>240 or shPosBig[i][2]>136 then
+    shPosBig[i] = {-1,-1}
+   end
+  end
+ end
 	
 	--pix(x, y, 12)
 	-- draw weapon
-	spr(1,xw1,yw1,0,1,0,0,1,1)
-	rectb(xw1, yw1, 8, 8, 2)
-	spr(2,xw2,yw2,0,1,0,0,1,1)
-	rectb(xw2, yw2, 8, 8, 2)
+	if w1_enabled then 
+	 spr(1,xw1,yw1,0,1,0,0,1,1)
+	 rectb(xw1, yw1, 8, 8, 2)
+	end
+	
+	if w2_enabled then 
+	 spr(2,xw2,yw2,0,1,0,0,1,1)
+	 rectb(xw2, yw2, 8, 8, 2)
+	end
 	
 	bw1 = {
  	bx= xw1, 
@@ -201,9 +241,20 @@ function TIC()
   bh= h 
  }
  
- col = AABB(bp, bw1)
+ col_big = AABB(bp, bw1)
+ col_small = AABB(bp, bw2)
  
- print("w1 : "..tostring(col),20,120)
+ if col_big then
+ 	w1_enabled=false
+  sh_type = 1
+ end
+ 
+ if col_small then
+ 	w2_enabled=false
+  sh_type = 2
+ end
+ 
+ print("w1 : "..tostring(col_big),20,120)
 	
  
 	--mwh=math.max(w,h)
