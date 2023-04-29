@@ -18,6 +18,9 @@ function BOOT()
  x_min=-1
  y_min=-1
  
+ --map
+ map_gen=false
+ 
  -- small weapon
  dirShoot={}
  shPos={}
@@ -41,14 +44,14 @@ function BOOT()
  sh_type=2
  
  --weapons
- xw1=200
- yw1=50
+ num_w1=0
+ num_w2=0
  
- xw2=100
- yw2=100
+ w1_pos={}
+	w2_pos={}
  
- w1_enabled=true
- w2_enabled=true
+ w1_enabled={}
+ w2_enabled={}
  
  --obstacle
  num_os=3
@@ -89,13 +92,78 @@ function BOOT()
   			-- note that each memory
   			-- cell holds two pixels
   			value1=perlin(j*2,i)
-			value2=perlin(j*2+1,i)
-   			mp[i][j]=value1 + value2 * 16
+		  	value2=perlin(j*2+1,i)
+   		mp[i][j]=value1 + value2 * 16
    			--trace(mp[i][j])
    			--mset(i//8,j//8,mp[i][j]%16)
   		end
  	end
 end
+
+function gen_wp()
+ local rd = math.random
+ w1_pos={}
+	w2_pos={}
+ w1_enabled={}
+ w2_enabled={}
+ num_w1 = rd(0,1)
+ num_w2 = rd(0,1)
+ 
+ for i=1, num_w1 do
+  w1_enabled[i]=true
+  w1_pos[i]={rd(1,240),rd(1,136)}
+ end
+ 
+ for i=1, num_w2 do
+  w2_enabled[i]=true
+  w2_pos[i]={rd(1,240),rd(1,136)}
+ end
+end
+
+function gen_jw()
+local rd = math.random
+ num_jw = rd(3,10)
+ jw_enabled ={}
+ jw_pos={}
+ jw_box={}
+ for i=1, num_jw do
+  jw_enabled[i]=true
+  jw_pos[i]={rd(1,240), rd(1,136)}
+  jw_box[i]={bx=jw_pos[i][1],by=jw_pos[i][2],bw=8,bh=8}
+ end
+end 
+
+function gen_ob()
+	local rd = math.random
+	num_os=rd(1,10)
+	os_enabled={}
+	bos={}
+	for i=1, num_os do
+		os_enabled[i]=true
+		bos[i]={bx=rd(1,240),
+		        by=rd(1,136),
+		        bw=rd(1,50),
+		        bh=rd(1,50)}
+	end
+end 
+
+function gen_en()
+	local rd = math.random
+  
+	num_en=rd(3,10)
+	ens_enabled={}
+	en_pos={}
+	en_box={}
+	
+	for i=1, num_os do
+		ens_enabled[i]=true
+		en_pos[i]={rd(1,240),rd(1,136)}
+		en_box[i]={bx=en_pos[i][1],
+		           by=en_pos[i][2],
+		           bw=8,
+		           bh=8}
+	end
+end 
 
 function render_sky()
 	for i=0,240 do
@@ -184,29 +252,34 @@ function transition_map()
 	if x>=240 then
 		x=0
 		mx=mx+30
+		map_gen=false
 	end
 
 	-- end of the map bottom
 	if y>=136 then
- 		y=0
+ 	y=0
 		my=my+18
+		map_gen=false
 	end
 
 	-- end of the map top
 	if y<0 then
- 		y=136
+ 	y=136
 		my=my-18
+		map_gen=false
 	end
 
 	-- come back to the previous map
 	if mx>0 and x<0 then
 		x=240
 		mx=mx-30
+		map_gen=false
 	end 
 
 	if mx==0 and x<0 and my>0 then
 		x=240
 		my=my-18
+		map_gen=false
 	end
 end 
 
@@ -257,6 +330,14 @@ function compute_sprite(angle, px, py, size, color)
 
 function TIC()
 
+	if not map_gen then
+		gen_ob()
+		gen_en()
+		gen_jw()
+		gen_wp()
+		map_gen=true 
+	end
+	
 -- input system for the player
 	local xmouse,ymouse,left,middle,right,scrollx,scrolly=mouse()
 	
@@ -496,32 +577,6 @@ function TIC()
    end
   end
  end
-	
-	--pix(x, y, 12)
-	-- draw weapon
-	if w1_enabled then 
-	 spr(1,xw1,yw1,0,1,0,0,1,1)
-	 rectb(xw1, yw1, 8, 8, 2)
-	end
-	
-	if w2_enabled then 
-	 spr(2,xw2,yw2,0,1,0,0,1,1)
-	 rectb(xw2, yw2, 8, 8, 2)
-	end
-	
-	bw1 = {
- 	bx= xw1, 
-  by= yw1,
-  bw= 8, 
-  bh= 8 
- }
- 
- bw2 = {
- 	bx= xw2, 
-  by= yw2,
-  bw= 8, 
-  bh= 8 
- }
  
  for i=1,num_jw do
  if jw_enabled[i] then
@@ -559,22 +614,42 @@ function TIC()
  
  
  -- collision with weapon 1
- if w1_enabled then
-  col_big = AABB(bp, bw1)
-  if col_big then
-  	w1_enabled=false
-   sh_type = 1
+ for i=1, num_w1 do
+  if w1_enabled[i] then
+   spr(1,w1_pos[i][1],w1_pos[i][2],0,1,0,0,1,1)
+	  rectb(w1_pos[i][1],w1_pos[i][2], 8, 8, 2)
+  	bw1 = {
+         	bx= w1_pos[i][1], 
+          by= w1_pos[i][2],
+          bw= 8, 
+          bh= 8 
+         }
+   col_big = AABB(bp, bw1)
+   if col_big then
+  	 w1_enabled[i]=false
+    sh_type = 1
+   end
   end
  end
  
  -- collision with weapon 2
- if w2_enabled then
-  col_small = AABB(bp, bw2)
-  if col_small then
- 	 w2_enabled=false
-   sh_type = 2
+ for i=1, num_w2 do
+  if w2_enabled[i] then
+   spr(2,w2_pos[i][1],w2_pos[i][2],0,1,0,0,1,1)
+	  rectb(w2_pos[i][1], w2_pos[i][2], 8, 8, 2)
+   bw2 = {
+ 	        bx= w2_pos[i][1], 
+          by= w2_pos[i][2],
+          bw= 8, 
+          bh= 8 
+         }
+   col_small = AABB(bp, bw2)
+   if col_small then
+ 	  w2_enabled[i]=false
+    sh_type = 2
+   end
   end
- end 
+ end
  
  --print("w1 : "..tostring(col_big),20,120)
 	--print("tri: "..a..", "..b..", "..c,20,60)
@@ -588,6 +663,7 @@ end
 -- 002:000000000000000000cccc0000c0000000c00000000000000000000000000000
 -- 003:0003000000333300333333333331333303313133033131330333333000333330
 -- 004:0000000000444400044c444004cc444004444440044444400044440000000000
+-- 005:000cc00000cccc000cccccc0cc0cc0cc000cc000000cc000000cc000000cc000
 -- </TILES>
 
 -- <WAVES>
