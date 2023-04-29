@@ -49,12 +49,10 @@ function BOOT()
  w2_enabled=true
  
  --obstacle
- bo = {
-  bx=20,
-  by=20,
-  bw=28,
-  bh=28
- }
+ os_enabled ={true, true, true}
+ bos = {{bx=20,by=20,bw=28,bh=28},
+ {bx=200,by=40,bw=8,bh=8},
+ {bx=100,by=100,bw=10,bh=10}}
  
 end
 
@@ -199,43 +197,62 @@ function TIC()
 	 
  rectb(x_min, y_min, w, h, 2)
 	
-	resPO = AABB(bp, bo)
+	for j=1,3 do
+	 if os_enabled[j] and AABB(bp, bos[j]) then
+	 	xp = x + vx
+ 	 yp = y + vy
+   a2,b2,c2,d2,e2,f2,color2 = compute_sprite(math.pi + angleRad, xp, yp,10, 12)
+	  w2=x_max-x_min
+	  h2=y_max-y_min
+		
+		 bp = {
+ 	  bx= x_min, 
+    by= y_min,
+    bw= w, 
+    bh= h 
+   }
+		
+		 if AABB(bp, bos[j]) then
+			 vx=-0.5*vx
+			 vy=-0.5*vy
+		 end
+	 end
+ end	
+	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
 	
-	if resPO then
-		xp = x + vx
- 	yp = y + vy
-  a2,b2,c2,d2,e2,f2,color2 = compute_sprite(math.pi + angleRad, xp, yp,10, 12)
-	 w2=x_max-x_min
-	 h2=y_max-y_min
-		
-		bp = {
- 	 bx= x_min, 
-   by= y_min,
-   bw= w, 
-   bh= h 
-  }
-		
-		resPO2 = AABB(bp, bo)
-		
-		if resPO2 then
-			vx=-0.5*vx
-			vy=-0.5*vy
-		end
-		
-		a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
-	
-	end
 
 	x = x + vx
 	y = y + vy
 	 
 	-- render obstacle
-	rect(bo.bx,bo.by,bo.bw,bo.bh,2)
+	for j=1,3 do
+	 if os_enabled[j] then
+   rect(bos[j].bx,bos[j].by,bos[j].bw,bos[j].bh,2)
+	 end
+	end
 	
 	for i=1,sh_max do
 		if shPos[i][1] > 0 then
 			pix(shPos[i][1],shPos[i][2], 12)
-			rectb(shPos[i][1]-1,shPos[i][2]-1,2,2,2)
+		
+			bb = {
+ 	  bx= shPos[i][1]-1, 
+    by= shPos[i][2]-1,
+    bw= 2, 
+    bh= 2 
+   }
+   
+   for j=1,3 do
+   if os_enabled[j] then
+    if AABB(bb, bos[j]) then 
+   	 os_enabled[j] = false
+     shPos[i] = {-1,-1}
+    end 
+			 shPosBox[i]=bb
+			end
+			end
+		
+			rectb(bb.bx, bb.by, bb.bw, bb.bh,2)
 			shPos[i]={shPos[i][1]+ dirShoot[i][1],shPos[i][2]+ dirShoot[i][2]}
  	 if shPos[i][1]>240 or shPos[i][2]>136 then
     shPos[i] = {-1,-1}
@@ -254,8 +271,15 @@ function TIC()
     bh= 11 
    }
    
-   resO = AABB(bb, bo)
-			shPosBigBox[i]=bb
+   for j=1,3 do
+    if os_enabled[j] then
+     if AABB(bb, bos[j]) then 
+    	 os_enabled[j] = false
+      shPosBig[i] = {-1,-1}
+     end 
+			  shPosBigBox[i]=bb
+			 end
+			end
 			
 			rectb(bb.bx,bb.by,bb.bw,bb.bh, 2)
 			shPosBig[i]={shPosBig[i][1]+ dirShootBig[i][1],shPosBig[i][2]+ dirShootBig[i][2]}
@@ -293,18 +317,25 @@ function TIC()
 	
 	tri(a,b,c,d,e,f,color)
  
- col_big = AABB(bp, bw1)
- col_small = AABB(bp, bw2)
  
- if col_big then
- 	w1_enabled=false
-  sh_type = 1
+ 
+ -- collision with weapon 1
+ if w1_enabled then
+  col_big = AABB(bp, bw1)
+  if col_big then
+  	w1_enabled=false
+   sh_type = 1
+  end
  end
  
- if col_small then
- 	w2_enabled=false
-  sh_type = 2
- end
+ -- collision with weapon 2
+ if w2_enabled then
+  col_small = AABB(bp, bw2)
+  if col_small then
+ 	 w2_enabled=false
+   sh_type = 2
+  end
+ end 
  
  print("w1 : "..tostring(col_big),20,120)
 	print("res PO: "..tostring(resPO),20,80)
