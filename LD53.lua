@@ -9,6 +9,8 @@
 function BOOT() 
  x=96
  y=24
+ mx=0
+ my=0
  vx=0
  vy=0
  x_max=-1
@@ -64,7 +66,103 @@ function BOOT()
   {bx=180,by=120,bw=8,bh=8},
   {bx=30,by=94,bw=8,bh=8}}
  
+  -- PERLIN NOISE
+ cntSky=0
+	bufferSky=1
+	seed = math.floor(math.random() * (1 << 16))
+	mp={}
+	value1=0
+	value2=0
+	for i=0,240 do
+		mp[i]={}
+  		for j=0,136 do
+  			-- note that each memory
+  			-- cell holds two pixels
+  			value1=perlin(j*2,i)
+			value2=perlin(j*2+1,i)
+   			mp[i][j]=value1 + value2 * 16
+   			--trace(mp[i][j])
+   			--mset(i//8,j//8,mp[i][j]%16)
+  		end
+ 	end
 end
+
+function render_sky()
+	for i=0,240 do
+		for j=0,136 do
+			if mp[i+mx*8] then
+				if cntSky==0 then
+			  pix(i,j,mp[i+mx*8][j]+8)
+				else
+					pix(i-1,j,mp[i+mx*8][j]+8)
+				end
+			end
+		end 
+	end
+	
+	bufferSky=bufferSky+1
+	
+	if bufferSky%120==0 then
+		bufferSky=1
+	 	if cntSky==0 then
+	  		cntSky=1
+	 	else
+	  		cntSky=0
+	 	end 
+	end
+end
+
+-- PERLIN NOISE FUNCTION
+
+-- deterministic 2d random, constants are arbitrary
+function noise(a, b) 
+    return ((a * 8754213 ~ b * 38678557 ~ seed) % 631) / 631
+end
+
+-- cosine interpolation between two values
+function interpolate(a, b, factor)
+    local ft = factor * math.pi
+    local f = (1 - math.cos(ft)) * 0.5
+    return  a * (1 - f) + b * f;
+end
+
+-- perlin noise
+function perlin(i, j)
+    local octave = 3
+    local total = 0
+    local n_total = 0
+
+    for n = 1, 5 do
+        local x = math.floor(i / octave)
+        local y = math.floor(j / octave)
+
+        -- compute noise cell
+        local v1 = noise(x, y)
+        local v2 = noise(x + 1, y)
+        local v3 = noise(x, y + 1)
+        local v4 = noise(x + 1, y + 1)
+
+        -- interpolate at given scale
+        local factor_x = (i % octave) / octave
+        local factor_y = (j % octave) / octave
+
+        local value1 = interpolate(v1, v2, factor_x)
+        local value2 = interpolate(v3, v4, factor_x)
+        local value3 = interpolate(value1, value2, factor_y)
+
+        total = total + value3 * n
+        octave = octave * 3
+        n_total = n_total + n
+    end
+
+    total = total / n_total
+
+    -- convert to color (7 colors)
+    intensity = math.floor(1 / (1 + math.exp(-(total -0.65)* 9)) * 7)
+    return intensity
+end
+
+-- PERLIN NOISE FUNCTION END
 
 function AABB(b1, b2)
 	if ((b2.bx >= b1.bx + b1.bw)
@@ -188,13 +286,14 @@ function TIC()
  end
 
 	cls(13)
+	render_sky()
  --spr(1+t%60//30*2,x,y,14,3,0,0,2,2)
 	--print("HELLO WORLD!",84,84)
 	
 	angleRad = math.atan2(y-ymouse,x-xmouse)
 	angle = (angleRad * 180 / math.pi + 360) %360
-	print("x, y : "..xmouse..", "..ymouse,84,50)
-	print("angle : "..angle,84,84)
+	--print("x, y : "..xmouse..", "..ymouse,84,50)
+	--print("angle : "..angle,84,84)
 	
 	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
 	w=x_max-x_min
