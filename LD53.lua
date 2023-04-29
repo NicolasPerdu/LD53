@@ -6,9 +6,21 @@
 -- version: 0.1
 -- script:  lua
 
---t=0
---x=96
---y=24
+function BOOT() 
+ x=96
+ y=24
+ dirShoot={}
+ shPos={}
+ 
+ for i=1,100 do
+  dirShoot[i]={-1,-1}
+  shPos[i]={-1,-1}
+ end
+
+	sh_auto_delay=20
+	sh_auto_buf=0
+ shoot=false
+end
 
 function draw_sprite(angle, px, py, size, color)
 	local math_cos = math.cos
@@ -26,27 +38,71 @@ function draw_sprite(angle, px, py, size, color)
 		color
 	)
  end
+ 
+ function magnitude(x, y)
+ 	return math.sqrt(x*x+y*y)
+ end
+ 
+ function norm(vec)
+ 	mag = magnitude(vec[1], vec[2])
+  vec[1] = vec[1]/mag
+  vec[2] = vec[2]/mag
+  return vec
+ end
 
 function TIC()
-
-	--if btn(0) then y=y-1 end
-	--if btn(1) then y=y+1 end
-	--if btn(2) then x=x-1 end
-	--if btn(3) then x=x+1 end
+	local xmouse,ymouse,left,middle,right,scrollx,scrolly=mouse()
+	
+	if btn(0) then y=y-1 end
+	if btn(1) then y=y+1 end
+	if btn(2) then x=x-1 end
+	if btn(3) then x=x+1 end
+	
+ if left then
+ 	if not shoot then
+  	i = 1
+  	while (shPos[i][1]>0) do
+  		i = i+1
+  	end
+  
+  	if i<100 then
+  	 dirShoot[i] = norm({xmouse-x, ymouse-y})
+  	 shPos[i] = {x, y}
+  	 shoot = true
+  	end
+  end
+ end
+ 
+ if shoot then
+ 	if sh_auto_buf >= sh_auto_delay then
+ 		shoot = false
+   sh_auto_buf = 0
+ 	else 
+ 		sh_auto_buf = sh_auto_buf+1
+  end
+ end
 
 	cls(13)
  --spr(1+t%60//30*2,x,y,14,3,0,0,2,2)
 	--print("HELLO WORLD!",84,84)
 	
-	local x,y,left,middle,right,scrollx,scrolly=mouse()
-	
-	angleRad = math.atan2(68-y,120-x)
+	angleRad = math.atan2(y-ymouse,x-xmouse)
 	angle = (angleRad * 180 / math.pi + 360) %360
-	print("x, y : "..x..", "..y,84,50)
+	print("x, y : "..xmouse..", "..ymouse,84,50)
 	print("angle : "..angle,84,84)
 	
-	pix(120, 68, 12)
-	draw_sprite(math.pi + angleRad, 120, 68,10, 12)
+	for i=1,100 do
+		if shPos[i][1] > 0 then
+			pix(shPos[i][1],shPos[i][2], 12)
+			shPos[i]={shPos[i][1]+ dirShoot[i][1],shPos[i][2]+ dirShoot[i][2]}
+ 	 if shPos[i][1]>240 or shPos[i][2]>136 then
+    shPos[i] = {-1,-1}
+   end
+  end
+ end
+	
+	pix(x, y, 12)
+	draw_sprite(math.pi + angleRad, x, y,10, 12)
 	--t=t+1
 end
 
