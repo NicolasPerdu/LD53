@@ -16,10 +16,16 @@ function BOOT()
  x_min=-1
  y_min=-1
  
+ -- small weapon
  dirShoot={}
  shPos={}
+ shPosBox={}
+ 
+ --heavy weapon with recoil
  dirShootBig={}
  shPosBig={}
+ shPosBigBox={}
+ 
  sh_max = 100
  for i=1,sh_max do
   dirShoot[i]={-1,-1}
@@ -42,6 +48,14 @@ function BOOT()
  w1_enabled=true
  w2_enabled=true
  
+ --obstacle
+ bo = {
+  bx=20,
+  by=20,
+  bw=28,
+  bh=28
+ }
+ 
 end
 
 function AABB(b1, b2)
@@ -55,7 +69,7 @@ function AABB(b1, b2)
 	end 
 end
 
-function draw_sprite(angle, px, py, size, color)
+function compute_sprite(angle, px, py, size, color)
 	local math_cos = math.cos
 	local math_sin = math.sin
 	local pos_x_scl = px
@@ -73,15 +87,7 @@ function draw_sprite(angle, px, py, size, color)
 	x_min = math.min(a,c,e)
 	y_min = math.min(b,d,f)
 	
-	tri(
-		a,
-		b,
-		c,
-		d,
-		e,
-		f,
-		color
-	)
+	return a,b,c,d,e,f,color
  end
  
  function magnitude(x, y)
@@ -125,9 +131,6 @@ function TIC()
 		
 	vx = clamp(vx, -1, 1)
 	vy = clamp(vy, -1, 1)
-	
-	x = x + vx
-	y = y + vy
 	
  if left then
  	if not shoot then
@@ -183,9 +186,56 @@ function TIC()
 	print("x, y : "..xmouse..", "..ymouse,84,50)
 	print("angle : "..angle,84,84)
 	
+	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
+	w=x_max-x_min
+	h=y_max-y_min
+	
+	bp = {
+ 	bx= x_min, 
+  by= y_min,
+  bw= w, 
+  bh= h 
+ }
+	 
+ rectb(x_min, y_min, w, h, 2)
+	
+	resPO = AABB(bp, bo)
+	
+	if resPO then
+		xp = x + vx
+ 	yp = y + vy
+  a2,b2,c2,d2,e2,f2,color2 = compute_sprite(math.pi + angleRad, xp, yp,10, 12)
+	 w2=x_max-x_min
+	 h2=y_max-y_min
+		
+		bp = {
+ 	 bx= x_min, 
+   by= y_min,
+   bw= w, 
+   bh= h 
+  }
+		
+		resPO2 = AABB(bp, bo)
+		
+		if resPO2 then
+			vx=-0.5*vx
+			vy=-0.5*vy
+		end
+		
+		a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
+	
+	end
+
+	x = x + vx
+	y = y + vy
+	 
+	-- render obstacle
+	rect(bo.bx,bo.by,bo.bw,bo.bh,2)
+	
 	for i=1,sh_max do
 		if shPos[i][1] > 0 then
 			pix(shPos[i][1],shPos[i][2], 12)
+			rectb(shPos[i][1]-1,shPos[i][2]-1,2,2,2)
 			shPos[i]={shPos[i][1]+ dirShoot[i][1],shPos[i][2]+ dirShoot[i][2]}
  	 if shPos[i][1]>240 or shPos[i][2]>136 then
     shPos[i] = {-1,-1}
@@ -196,6 +246,18 @@ function TIC()
  for i=1,sh_max do
 		if shPosBig[i][1] > 0 then
 			circ(shPosBig[i][1],shPosBig[i][2],5, 12)
+			
+			bb = {
+ 	  bx= shPosBig[i][1]-5, 
+    by= shPosBig[i][2]-5,
+    bw= 11, 
+    bh= 11 
+   }
+   
+   resO = AABB(bb, bo)
+			shPosBigBox[i]=bb
+			
+			rectb(bb.bx,bb.by,bb.bw,bb.bh, 2)
 			shPosBig[i]={shPosBig[i][1]+ dirShootBig[i][1],shPosBig[i][2]+ dirShootBig[i][2]}
  	 if shPosBig[i][1]>240 or shPosBig[i][2]>136 then
     shPosBig[i] = {-1,-1}
@@ -229,17 +291,7 @@ function TIC()
   bh= 8 
  }
 	
-	draw_sprite(math.pi + angleRad, x, y,10, 12)
-	
-	w=x_max-x_min
-	h=y_max-y_min
-	
-	bp = {
- 	bx= x, 
-  by= y,
-  bw= w, 
-  bh= h 
- }
+	tri(a,b,c,d,e,f,color)
  
  col_big = AABB(bp, bw1)
  col_small = AABB(bp, bw2)
@@ -255,10 +307,10 @@ function TIC()
  end
  
  print("w1 : "..tostring(col_big),20,120)
+	print("res PO: "..tostring(resPO),20,80)
 	
  
 	--mwh=math.max(w,h)
-	rectb(x_min, y_min, w, h, 2)
 end
 
 -- <TILES>
