@@ -7,16 +7,17 @@
 -- script:  lua
 
 function BOOT() 
- x=96
- y=24
- mx=0
- my=0
+ x=120
+ y=68
+ --mx=0
+ --my=0
  vx=0
  vy=0
  x_max=-1
  y_max=-1
  x_min=-1
  y_min=-1
+ lifep = 100
  
  --map
  map_gen=false
@@ -62,6 +63,16 @@ function BOOT()
  bos = {{bx=20,by=20,bw=28,bh=28},
  {bx=200,by=40,bw=8,bh=8},
  {bx=100,by=100,bw=10,bh=10}}
+
+ --goal
+ num_dir=5
+ dir_goal={}
+ dir_goal_buffer={}
+ index_goal = 1
+ for i=1, num_dir do
+  dir_goal_buffer[i] = math.random(0,3)
+ end
+ dir_goal =  dir_goal_buffer 
  
  --enemies
  num_en=3
@@ -245,45 +256,65 @@ end
 
 -- PERLIN NOISE FUNCTION END
 
+function get_current_goal()
+	i = 1
+	while(dir_goal_buffer[i] == -1) do
+	   i=i+1
+	end
+end
+
+function update_goal(dir)
+	if dir_goal_buffer[index_goal]==dir then
+		index_goal = index_goal+1
+	else
+		dir_goal_buffer = dir_goal
+		index_goal = 1
+	end
+end 
+
 function transition_map()
 	-- begin of the level
-	if mx==0 and x<0 and my==0 then
-		x=0
+	--if mx==0 and x<0 and my==0 then
+		--x=0
+	--end
+
+	-- end of the map top
+	if y<0 then
+		y=130
+		--my=my-18
+		map_gen=false
+		update_goal(0)
 	end
 
 	-- end of the map right
 	if x>=240 then
 		x=0
-		mx=mx+30
+		--mx=mx+30
+		update_goal(1)
 		map_gen=false
 	end
 
 	-- end of the map bottom
 	if y>=136 then
- 	y=0
-		my=my+18
+ 		y=0
+		--my=my+18
 		map_gen=false
+		update_goal(2)
 	end
 
-	-- end of the map top
-	if y<0 then
- 	y=136
-		my=my-18
+	-- end of the map left 
+	if x<0 then
+		x=236
+		--mx=mx-30
 		map_gen=false
-	end
-
-	-- come back to the previous map
-	if mx>0 and x<0 then
-		x=240
-		mx=mx-30
-		map_gen=false
+		update_goal(3)
 	end 
 
-	if mx==0 and x<0 and my>0 then
-		x=240
-		my=my-18
-		map_gen=false
-	end
+	--if mx==0 and x<0 and my>0 then
+	--	x=240
+		--my=my-18
+	--	map_gen=false
+	--end
 end 
 
 function AABB(b1, b2)
@@ -435,6 +466,13 @@ function TIC()
  transition_map()
 
 	cls(13)
+ 	
+	-- check for victory
+	if num_dir == index_goal then
+	 print("MISSION COMPLETE!",84,84)
+	 return
+	end 
+
 	render_sky()
  --spr(1+t%60//30*2,x,y,14,3,0,0,2,2)
 	--print("HELLO WORLD!",84,84)
@@ -465,7 +503,7 @@ function TIC()
    en_box[i].by=en_pos[i][2]
   
    if AABB(bp, en_box[i]) then
-			 -- collision enemy player 
+	lifep= lifep-4
 		 end
 		end
  end
@@ -479,7 +517,7 @@ function TIC()
 		end
  end
 	 
- rectb(x_min, y_min, w, h, 2)
+ --rectb(x_min, y_min, w, h, 2)
 	
 	-- obstacles collision
 	for j=1,num_os do
@@ -549,7 +587,7 @@ function TIC()
 			end
 			end
 		
-			rectb(bb.bx, bb.by, bb.bw, bb.bh,2)
+			--rectb(bb.bx, bb.by, bb.bw, bb.bh,2)
 			shPos[i]={shPos[i][1]+ dirShoot[i][1],shPos[i][2]+ dirShoot[i][2]}
  	 if shPos[i][1]>240 or shPos[i][2]>136 then
     shPos[i] = {-1,-1}
@@ -590,7 +628,7 @@ function TIC()
 			end
 			end
 			
-			rectb(bb.bx,bb.by,bb.bw,bb.bh, 2)
+			--rectb(bb.bx,bb.by,bb.bw,bb.bh, 2)
 			shPosBig[i]={shPosBig[i][1]+ dirShootBig[i][1],shPosBig[i][2]+ dirShootBig[i][2]}
  	 if shPosBig[i][1]>240 or shPosBig[i][2]>136 then
     shPosBig[i] = {-1,-1}
@@ -600,12 +638,7 @@ function TIC()
  
  for i=1,num_jw do
  if jw_enabled[i] then
-   rectb(jw_box[i].bx,
-  				 		jw_box[i].by,
-  			 			jw_box[i].bw,
-  		 				jw_box[i].bh,
-         2
-   )
+   --rectb(jw_box[i].bx,jw_box[i].by,jw_box[i].bw,jw_box[i].bh,2)
    spr(4,jw_pos[i][1],jw_pos[i][2],0,1,0,0,1,1)
   end
  end
@@ -622,12 +655,7 @@ function TIC()
   --bens[i].y3,
   --color)
   if ens_enabled[i] then
-   rectb(en_box[i].bx,
-  				 		en_box[i].by,
-  			 			en_box[i].bw,
-  		 				en_box[i].bh,
-         2
-   )
+   --rectb(en_box[i].bx,en_box[i].by,en_box[i].bw,en_box[i].bh,2)
    spr(3,en_pos[i][1],en_pos[i][2],0,1,0,0,1,1)
   end
  end 
@@ -637,7 +665,7 @@ function TIC()
  for i=1, num_w1 do
   if w1_enabled[i] then
    spr(1,w1_pos[i][1],w1_pos[i][2],0,1,0,0,1,1)
-	  rectb(w1_pos[i][1],w1_pos[i][2], 8, 8, 2)
+	  --rectb(w1_pos[i][1],w1_pos[i][2], 8, 8, 2)
   	bw1 = {
          	bx= w1_pos[i][1], 
           by= w1_pos[i][2],
@@ -656,7 +684,7 @@ function TIC()
  for i=1, num_w2 do
   if w2_enabled[i] then
    spr(2,w2_pos[i][1],w2_pos[i][2],0,1,0,0,1,1)
-	  rectb(w2_pos[i][1], w2_pos[i][2], 8, 8, 2)
+	  --rectb(w2_pos[i][1], w2_pos[i][2], 8, 8, 2)
    bw2 = {
  	        bx= w2_pos[i][1], 
           by= w2_pos[i][2],
@@ -670,12 +698,13 @@ function TIC()
    end
   end
  end
+
+ rect(10,10,lifep//2,5,2)
  
- --print("w1 : "..tostring(col_big),20,120)
-	--print("tri: "..a..", "..b..", "..c,20,60)
-	--print("tri: "..d..", "..e..", "..f,20,80)
- 
-	--mwh=math.max(w,h)
+ -- goal
+ --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
+	
+ spr(5,220,10,0,1,0,dir_goal_buffer[index_goal],1,1)
 end
 
 -- <TILES>
@@ -683,7 +712,7 @@ end
 -- 002:0000000000c00c0000cccc000c0cc0c00c0000c00c0000c00c0000c000000000
 -- 003:0055550005155150555115555515515555555555555115550515515000555500
 -- 004:200000020303303000444400034cc430034cc430004444000303303020000002
--- 005:000cc00000cccc000cccccc0cc0cc0cc000cc000000cc000000cc000000cc000
+-- 005:002cc20002cccc202cccccc2cc2cc2cc222cc222002cc200002cc200002cc200
 -- </TILES>
 
 -- <SPRITES>
