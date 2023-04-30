@@ -56,7 +56,7 @@ function BOOT()
  num_w2=0
  
  w1_pos={}
-	w2_pos={}
+ w2_pos={}
  
  w1_enabled={}
  w2_enabled={}
@@ -95,13 +95,23 @@ function BOOT()
  num_en_max=5
  num_en=3
  ens_enabled ={true, true, true}
- --bens = {{x1=0,y1=0,x2=10,y2=0,x3=5,y3=20},
- --{x1=180,y1=120,x2=187,y2=121,x3=195,y3=114},
- --{x1=30,y1=94,x2=12,y2=101,x3=18,y3=110}}
  en_pos = {{0, 0}, {180, 120}, {30, 94}}
  en_box = {{bx=0,by=0,bw=8,bh=8},
   {bx=180,by=120,bw=8,bh=8},
   {bx=30,by=94,bw=8,bh=8}}
+
+  num_en_sh_min=1
+  num_en_sh_max=1
+  num_en_sh=0
+  ens_sh_enabled = {}
+  en_sh_pos = {}
+  en_sh_box = {}
+  en_sh_bullet_pos = {}
+  en_sh_bullet_dir = {}
+  en_sh_bullet_box = {}
+  en_sh_bullet_enabled = {}
+  num_sh_bullet = {}
+  en_sh_delay_shooting = {}
   
   -- jewel to pick up
   num_jw = 3
@@ -202,6 +212,40 @@ function gen_ob()
 		        by=rd(1,136),
 		        bw=rd(5,30),
 		        bh=rd(5,30)}
+	end
+end 
+
+function gen_en_sh()
+	local rd = math.random
+  
+	num_en_sh=rd(num_en_sh_min,num_en_sh_max)
+	ens_sh_enabled={}
+	en_sh_pos={}
+	en_sh_box={}
+	en_sh_bullet_pos={}
+	en_sh_bullet_dir={}
+	en_sh_bullet_box={}
+	num_sh_bullet = {}
+	en_sh_delay_shooting={}
+	
+	for i=1, num_en_sh do
+		ens_sh_enabled[i]=true
+		en_sh_delay_shooting[i]=0
+		en_sh_pos[i]={rd(1,240),rd(1,136)}
+		val=magnitude(x-en_sh_pos[i][1], y-en_sh_pos[i][2])
+		while (val < 30) do
+			en_sh_pos[i]={rd(1,240),rd(1,136)}
+			val=magnitude(x-en_sh_pos[i][1], y-en_sh_pos[i][2])
+		end
+		en_sh_box[i]={bx=en_sh_pos[i][1],
+		           by=en_sh_pos[i][2],
+		           bw=8,
+		           bh=8}
+		num_sh_bullet[i]=0
+		en_sh_bullet_pos[i]={}
+		en_sh_bullet_dir[i]={}
+		en_sh_bullet_box[i]={}
+		en_sh_bullet_enabled[i]={}
 	end
 end 
 
@@ -532,6 +576,21 @@ end
 		cl_enabled[num_cl] = true
 		cl_pos[num_cl] = {en_pos[j][1], en_pos[j][2]}
 		cl_box[num_cl] =  {bx=en_pos[j][1],by=en_pos[j][2],bw=8,bh=8}
+	end
+ end
+
+ function gen_boost_sh(j)
+	ch = math.random(1, 2)
+	if(ch == 1) then 
+		num_sp = num_sp + 1				
+		sp_enabled[num_sp] = true
+		sp_pos[num_sp] = {en_sh_pos[j][1], en_sh_pos[j][2]}
+		sp_box[num_sp] =  {bx=en_sh_pos[j][1],by=en_sh_pos[j][2],bw=8,bh=8}
+	else
+		num_cl = num_cl + 1				
+		cl_enabled[num_cl] = true
+		cl_pos[num_cl] = {en_sh_pos[j][1], en_sh_pos[j][2]}
+		cl_box[num_cl] =  {bx=en_sh_pos[j][1],by=en_sh_pos[j][2],bw=8,bh=8}
 	end 
 	
  end 
@@ -575,10 +634,23 @@ end
 			 		shPosBox[i]=bb
 				end
 			end
+
+			for j=1,num_en_sh do
+				if ens_sh_enabled[j] then
+    				-- collision bullet enemies
+    				if AABB(bb, en_sh_box[j]) then 
+						gen_boost_sh(j)
+						ens_sh_enabled[j] = false
+     					shPos[i] = {-1,-1}
+						score = score + 1
+    				end 
+			 		shPosBox[i]=bb
+				end
+			end
 		
 			--rectb(bb.bx, bb.by, bb.bw, bb.bh,2)
 			shPos[i]={shPos[i][1]+ dirShoot[i][1],shPos[i][2]+ dirShoot[i][2]}
- 	 		if shPos[i][1]>240 or shPos[i][2]>136 then
+ 	 		if shPos[i][1]>240 or shPos[i][2]>136 or shPos[i][1]<0 or shPos[i][2]<0 then
     			shPos[i] = {-1,-1}
    			end
   		end
@@ -648,16 +720,29 @@ function render_col_big_gun()
 			end
 			
 			for j=1,num_en do
-			if ens_enabled[j] then
-    -- collision bullet enemies
-    if AABB(bb, en_box[j]) then 
-		gen_boost(j)
-	 	ens_enabled[j] = false
-		shPosBig[i] = {-1,-1}
-		score = score + 1
-    end 
-			 shPosBigBox[i]=bb
+				if ens_enabled[j] then
+    				-- collision bullet enemies
+    				if AABB(bb, en_box[j]) then 
+						gen_boost(j)
+	 					ens_enabled[j] = false
+						shPosBig[i] = {-1,-1}
+						score = score + 1
+    				end 
+			 		shPosBigBox[i]=bb
+				end
 			end
+
+			for j=1,num_en_sh do
+				if ens_sh_enabled[j] then
+    				-- collision bullet enemies
+    				if AABB(bb, en_sh_box[j]) then 
+						gen_boost_sh(j)
+	 					ens_sh_enabled[j] = false
+						shPosBig[i] = {-1,-1}
+						score = score + 1
+    				end 
+			 		shPosBigBox[i]=bb
+				end
 			end
 			
 			--rectb(bb.bx,bb.by,bb.bw,bb.bh, 2)
@@ -707,6 +792,7 @@ function gen_random_map()
 
 		gen_ob()
 		gen_en()
+		gen_en_sh()
 		gen_jw()
 		gen_wp()
 		map_gen=true 
@@ -825,6 +911,16 @@ for i=1,num_en do
    end 
 end
 
+function render_enemies_sh()
+	-- render the enemies
+	for i=1,num_en_sh do 
+		if ens_sh_enabled[i] then
+		 --rectb(en_box[i].bx,en_box[i].by,en_box[i].bw,en_box[i].bh,2)
+		 spr(17,en_sh_pos[i][1],en_sh_pos[i][2],0,1,0,0,1,1)
+		end
+	   end 
+	end
+
 function render_jw()
 	for i=1,num_jw do
 		if jw_enabled[i] then
@@ -905,7 +1001,7 @@ render_sky()
   		bh= h 
  	}
  
- -- input system for the enemy
+ -- input system for the enemy moving
  speed_en = 0.2
  for i=1,num_en do
  	if ens_enabled[i] then
@@ -922,6 +1018,62 @@ render_sky()
 		end
 	end
  end
+
+ -- input system for the enemhy shooting
+ for i=1,num_en_sh do
+ 	if ens_sh_enabled[i] then
+		if en_sh_delay_shooting[i] < 100 then
+			en_sh_delay_shooting[i] = en_sh_delay_shooting[i] + 1
+		else -- shoot 
+			en_sh_delay_shooting[i] = 0
+ 			dir = norm({x-en_sh_pos[i][1], y-en_sh_pos[i][2]})
+			num_sh_bullet[i] = num_sh_bullet[i] + 1
+			en_sh_bullet_enabled[i][num_sh_bullet[i]] = true
+ 			en_sh_bullet_pos[i][num_sh_bullet[i]] = {en_sh_pos[i][1],en_sh_pos[i][2]} 
+			en_sh_bullet_dir[i][num_sh_bullet[i]] = {dir[1],dir[2]} 
+   			en_sh_bullet_box[i][num_sh_bullet[i]] = {bx=en_sh_bullet_pos[i][num_sh_bullet[i]][1],by=en_sh_bullet_pos[i][num_sh_bullet[i]][2],bw=2,bh=2}
+		end
+
+   		if AABB(bp, en_sh_box[i]) then
+			lifep = lifep-1
+			if lifep < 0 then
+				game_over = true
+			end
+		end
+	end
+ end
+
+
+
+ 
+ -- update the bullets and render and collision with player
+ speed_bul=1
+ for i=1,num_en do
+	if ens_sh_enabled[i] then
+ 		for j=1,num_sh_bullet[i] do
+			if en_sh_bullet_enabled[i][j] then
+				en_sh_bullet_pos[i][j]= {en_sh_bullet_pos[i][j][1]+en_sh_bullet_dir[i][j][1]*speed_bul,
+										en_sh_bullet_pos[i][j][2]+en_sh_bullet_dir[i][j][2]*speed_bul}
+				en_sh_bullet_box[i][j]= {bx=en_sh_bullet_pos[i][j][1],by=en_sh_bullet_pos[i][j][2],bw=2,bh=2}
+				
+				if en_sh_bullet_pos[i][j][1]>240 or en_sh_bullet_pos[i][j][2]>136 or en_sh_bullet_pos[i][j][1]<0 or en_sh_bullet_pos[i][j][2]<0 then
+					en_sh_bullet_enabled[i][j] = false
+				end
+
+				pix(en_sh_bullet_pos[i][j][1], en_sh_bullet_pos[i][j][2], 12)
+				-- rectb(en_sh_bullet_box[i][j].bx, en_sh_bullet_box[i][j].by, en_sh_bullet_box[i][j].bw, en_sh_bullet_box[i][j].bh, 2)
+
+				if AABB(bp, en_sh_bullet_box[i][j]) then
+					lifep = lifep-2
+					en_sh_bullet_enabled[i][j] = false
+					if lifep < 0 then
+						game_over = true
+					end
+				end
+			end
+ 		end
+	end
+end
  
  collision_jw()
  collision_sp()
@@ -953,7 +1105,8 @@ render_sky()
 	tri(a,b,c,d,e,f,color)
  
  render_enemies()
- 
+ render_enemies_sh()
+
  wp1_collision()
  wp2_collision()
 
@@ -983,6 +1136,7 @@ end
 -- 007:00000000000cccc000c000000c0000000c00000000c00000000cccc000000000
 -- 008:000000000cccccc00cccccc0000cc000000cc000000cc000000cc00000000000
 -- 009:000000000cc000000cc000000cc000000cc000000cccccc00cccccc000000000
+-- 017:0004400000444400004444000444444004444440044444404444444444444444
 -- </TILES>
 
 -- <SPRITES>
