@@ -115,6 +115,12 @@ function BOOT()
   sp_enabled ={}
   sp_pos = {}
   sp_box = {}
+
+   -- speed boost
+   num_cl = 0
+   cl_enabled ={}
+   cl_pos = {}
+   cl_box = {}
   
   -- PERLIN NOISE
  cntSky=0
@@ -284,6 +290,18 @@ function perlin(i, j)
     return intensity
 end
 
+function collision_cl()
+	-- collision with cooldown boost
+	for i=1,num_cl do
+		if cl_enabled[i] then
+			if AABB(bp, cl_box[i]) then
+				cl_enabled[i]=false
+				sh_auto_delay = sh_auto_delay-1
+			end
+		end
+	 end
+	end
+
 function collision_sp()
 	-- collision with speed boost
 	for i=1,num_sp do
@@ -406,7 +424,7 @@ function shooting(xmouse, ymouse)
 		  shoot = true
 	  
 	   -- recoil
-	   recoil=2
+	   recoil=4
 	   x=x-dirShootBig[i][1]*recoil
 	   y=y-dirShootBig[i][2]*recoil
 	  end
@@ -448,6 +466,22 @@ function compute_sprite(angle, px, py, size, color)
  
  function clamp(n, low, high) return math.min(math.max(n, low), high) end
 
+ function gen_boost(j)
+	ch = math.random(1, 2)
+	if(ch == 1) then 
+		num_sp = num_sp + 1				
+		sp_enabled[num_sp] = true
+		sp_pos[num_sp] = {en_pos[j][1], en_pos[j][2]}
+		sp_box[num_sp] =  {bx=en_pos[j][1],by=en_pos[j][2],bw=8,bh=8}
+	else
+		num_cl = num_cl + 1				
+		cl_enabled[num_cl] = true
+		cl_pos[num_cl] = {en_pos[j][1], en_pos[j][2]}
+		cl_box[num_cl] =  {bx=en_pos[j][1],by=en_pos[j][2],bw=8,bh=8}
+	end 
+	
+ end 
+
  function render_col_small_gun()
 	for i=1,sh_max do
 		if shPos[i][1] > 0 then
@@ -478,10 +512,7 @@ function compute_sprite(angle, px, py, size, color)
 				if ens_enabled[j] then
     				-- collision bullet enemies
     				if AABB(bb, en_box[j]) then 
-						num_sp = num_sp + 1
-						sp_enabled[num_sp] = true
-						sp_pos[num_sp] = {en_pos[j][1], en_pos[j][2]}
-						sp_box[num_sp] =  {bx=en_pos[j][1],by=en_pos[j][2],bw=8,bh=8}
+						gen_boost(j)
 						ens_enabled[j] = false
      					shPos[i] = {-1,-1}
 						score = score + 1
@@ -502,7 +533,17 @@ end
 function render_sp()
 	for i=1,num_sp do
 		if sp_enabled[i] then
-			spr(6,sp_pos[i][1],sp_pos[i][1],0,1,0,0,1,1)
+			--rectb(sp_box[i].bx,sp_box[i].by,sp_box[i].bw,sp_box[i].bh, 2)
+			spr(6,sp_pos[i][1],sp_pos[i][2],0,1,0,0,1,1)
+		end
+	end 
+end
+
+function render_cl()
+	for i=1,num_cl do
+		if cl_enabled[i] then
+			--rectb(cl_box[i].bx,cl_box[i].by,cl_box[i].bw,cl_box[i].bh, 2)
+			spr(6,cl_pos[i][1],cl_pos[i][2],0,1,0,0,1,1)
 		end
 	end 
 end
@@ -537,10 +578,7 @@ function render_col_big_gun()
 			if ens_enabled[j] then
     -- collision bullet enemies
     if AABB(bb, en_box[j]) then 
-		num_sp = num_sp + 1
-		sp_enabled[num_sp] = true
-		sp_pos[num_sp] = {en_pos[j][1], en_pos[j][2]}
-		sp_box[num_sp] = {bx=en_pos[j][1],by=en_pos[j][2],bw=8,bh=8}
+		gen_boost(j)
 	 	ens_enabled[j] = false
 		shPosBig[i] = {-1,-1}
 		score = score + 1
@@ -584,6 +622,16 @@ end
 
 function gen_random_map()
 	if not map_gen then
+		num_sp = 0
+		sp_enabled ={}
+ 		sp_pos = {}
+  		sp_box = {}
+
+   		num_cl = 0
+   		cl_enabled ={}
+   		cl_pos = {}
+   		cl_box = {}
+
 		gen_ob()
 		gen_en()
 		gen_jw()
@@ -713,6 +761,15 @@ function render_jw()
 		end
 end
 
+function render_ob()
+-- render obstacle
+for j=1, num_os do
+	if os_enabled[j] then
+	   rect(bos[j].bx,bos[j].by,bos[j].bw,bos[j].bh,0)
+	end
+   end
+end 
+
 function TIC()
 
 	gen_random_map()
@@ -793,6 +850,7 @@ render_sky()
  
  collision_jw()
  collision_sp()
+ collision_cl()
 	 
  --rectb(x_min, y_min, w, h, 2)
 	
@@ -804,18 +862,13 @@ render_sky()
 	x = x + vx
 	y = y + vy
 	 
-	-- render obstacle
-	for j=1, num_os do
-	 if os_enabled[j] then
-   rect(bos[j].bx,bos[j].by,bos[j].bw,bos[j].bh,2)
-	 end
-	end
-	
+	render_ob()
 	render_col_small_gun()
 	render_col_big_gun()
  
 	render_jw()
 	render_sp()
+	render_cl()
 	
  -- render the player
 	tri(a,b,c,d,e,f,color)
@@ -834,6 +887,7 @@ render_sky()
  spr(5,220,10,0,1,0,dir_goal_buffer[index_goal],1,1)
  print("score: "..tostring(score),120,5, 0)
 
+ print("cooldown: "..tostring(sh_auto_delay),5,120, 0)
  print("speed: "..tostring(max_speed_x),5,130, 0)
 	
  check_render_timer()
@@ -846,7 +900,8 @@ end
 -- 003:0055550005155150555115555515515555555555555115550515515000555500
 -- 004:200000020303303000444400034cc430034cc430004444000303303020000002
 -- 005:002cc20002cccc202cccccc2cc2cc2cc222cc222002cc200002cc200002cc200
--- 006:00cccc000c0000000c00000000ccc00000000c0000000c0000000c000cccc000
+-- 006:00000000000ccc0000c00000000c00000000c00000000c0000ccc00000000000
+-- 007:00000000000cccc000c000000c0000000c00000000c00000000cccc000000000
 -- </TILES>
 
 -- <SPRITES>
