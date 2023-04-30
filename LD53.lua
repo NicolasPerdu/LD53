@@ -117,7 +117,7 @@ function BOOT()
   sp_pos = {}
   sp_box = {}
 
-   -- speed boost
+   -- cooldown boost
    num_cl = 0
    cl_enabled ={}
    cl_pos = {}
@@ -128,6 +128,12 @@ function BOOT()
    tm_enabled = {}
    tm_pos = {}
    tm_box = {}
+
+   -- life boost
+   num_lf = 0
+   lf_enabled = {}
+   lf_pos = {}
+   lf_box = {}
   
   -- PERLIN NOISE
  cntSky=0
@@ -321,6 +327,18 @@ function collision_cl()
 		 end
 		end
 
+		function collision_lf()
+			-- collision with cooldown boost
+			for i=1,num_lf do
+				if lf_enabled[i] then
+					if AABB(bp, lf_box[i]) then
+						lf_enabled[i]=false
+						lifep = lifep+10
+					end
+				end
+			 end
+			end
+
 function collision_sp()
 	-- collision with speed boost
 	for i=1,num_sp do
@@ -485,6 +503,23 @@ function compute_sprite(angle, px, py, size, color)
  
  function clamp(n, low, high) return math.min(math.max(n, low), high) end
 
+ function gen_boost_ob(j)
+	ch = math.random(1, 2)
+	if(ch == 1) then
+		--spawn time 
+		num_tm = num_tm + 1				
+		tm_enabled[num_tm] = true
+		tm_pos[num_tm] = {bos[j].bx, bos[j].by}
+		tm_box[num_tm] =  {bx=bos[j].bx,by=bos[j].by,bw=8,bh=8}
+	else
+		--spawn life
+		num_lf = num_lf + 1				
+		lf_enabled[num_lf] = true
+		lf_pos[num_lf] = {bos[j].bx, bos[j].by}
+		lf_box[num_lf] =  {bx=bos[j].bx,by=bos[j].by,bw=8,bh=8}
+	end  
+end 
+
  function gen_boost(j)
 	ch = math.random(1, 2)
 	if(ch == 1) then 
@@ -520,11 +555,7 @@ function compute_sprite(angle, px, py, size, color)
 						os_life[j] = os_life[j]-1
 						if os_life[j] <= 0 then
    	 						os_enabled[j] = false
-							--spawn time 
-							num_tm = num_tm + 1				
-							tm_enabled[num_tm] = true
-							tm_pos[num_tm] = {bos[j].bx, bos[j].by}
-							tm_box[num_tm] =  {bx=bos[j].bx,by=bos[j].by,bw=8,bh=8}
+							gen_boost_ob(j)
 						end
      					shPos[i] = {-1,-1}
     				end
@@ -577,6 +608,15 @@ function render_tm()
 		if tm_enabled[i] then
 			--rectb(cl_box[i].bx,cl_box[i].by,cl_box[i].bw,cl_box[i].bh, 2)
 			spr(8,tm_pos[i][1],tm_pos[i][2],0,1,0,0,1,1)
+		end
+	end 
+end
+
+function render_lf()
+	for i=1,num_lf do
+		if lf_enabled[i] then
+			--rectb(cl_box[i].bx,cl_box[i].by,cl_box[i].bw,cl_box[i].bh, 2)
+			spr(9,lf_pos[i][1],lf_pos[i][2],0,1,0,0,1,1)
 		end
 	end 
 end
@@ -839,6 +879,7 @@ cls(9)
 if num_dir == index_goal or game_win then
 	game_win = true
 	print("MISSION COMPLETE!",30,60, 12, false, 2)
+	print("SCORE: "..tostring(score),70,90, 12, false, 2)
 	return
 end
 if game_over then
@@ -886,6 +927,7 @@ render_sky()
  collision_sp()
  collision_cl()
  collision_tm()
+ collision_lf()
 	 
  --rectb(x_min, y_min, w, h, 2)
 	
@@ -905,6 +947,7 @@ render_sky()
 	render_sp()
 	render_cl()
 	render_tm()
+	render_lf()
 	
  -- render the player
 	tri(a,b,c,d,e,f,color)
@@ -939,6 +982,7 @@ end
 -- 006:00000000000ccc0000c00000000c00000000c00000000c0000ccc00000000000
 -- 007:00000000000cccc000c000000c0000000c00000000c00000000cccc000000000
 -- 008:000000000cccccc00cccccc0000cc000000cc000000cc000000cc00000000000
+-- 009:000000000cc000000cc000000cc000000cc000000cccccc00cccccc000000000
 -- </TILES>
 
 -- <SPRITES>
