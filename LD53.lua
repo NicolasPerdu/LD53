@@ -341,13 +341,28 @@ function TIC()
 		map_gen=true 
 	end
 	
+-- crosshair cursor
+	poke(0x3FFB,1)	
+	
 -- input system for the player
 	local xmouse,ymouse,left,middle,right,scrollx,scrolly=mouse()
 	
-	if btn(0) then vy=vy-0.2 end
-	if btn(1) then vy=vy+0.2 end
-	if btn(2) then vx=vx-0.2 end
-	if btn(3) then vx=vx+0.2 end
+	if btn(0) then
+	 vy=vy-0.2
+	--	sfx (28,12,-1,0,2,4)
+ end
+	if btn(1) then
+	 vy=vy+0.2
+	--	sfx (28,12,-1,0,2,4)
+ end
+	if btn(2) then
+	 vx=vx-0.2
+	--	sfx (28,12,-1,0,2,4)
+ end
+	if btn(3) then
+	 vx=vx+0.2
+	--	sfx (28,12,-1,0,2,4)
+ end
 	
 	if not btn(0) 
 		and not btn(1)
@@ -385,7 +400,7 @@ function TIC()
   
   	if i<sh_max then
   	 if sh_type==2 then
-    sfx (19,14,-1,0,15,4) 
+   	 sfx (19,14,10,1,15,4) 
      dirShoot[i] = norm({xmouse-x, ymouse-y})
   	  shPos[i] = {x, y}
   	  shoot = true
@@ -394,6 +409,7 @@ function TIC()
      x=x-dirShoot[i][1]
      y=y-dirShoot[i][2]
     elseif sh_type==1 then
+    	sfx (19,14,10,1,15,4)
      dirShootBig[i] = norm({xmouse-x, ymouse-y})
   	  shPosBig[i] = {x, y}
   	  shoot = true
@@ -670,6 +686,10 @@ end
 -- 005:000cc00000cccc000cccccc0cc0cc0cc000cc000000cc000000cc000000cc000
 -- </TILES>
 
+-- <SPRITES>
+-- 001:ccf00fccfcf00fcf0fc00cf000000000000000000fc00cf0fcf00fcfccf00fcc
+-- </SPRITES>
+
 -- <WAVES>
 -- 000:00000000ffffffff00000000ffffffff
 -- 001:00000000fffffffffffffff000000000
@@ -737,7 +757,7 @@ end
 -- </PATTERNS>
 
 -- <TRACKS>
--- 000:180301000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+-- 000:180301000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000
 -- </TRACKS>
 
 -- <PALETTE>
