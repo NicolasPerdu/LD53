@@ -101,7 +101,7 @@ function BOOT()
   {bx=30,by=94,bw=8,bh=8}}
 
   num_en_sh_min=1
-  num_en_sh_max=1
+  num_en_sh_max=3
   num_en_sh=0
   ens_sh_enabled = {}
   en_sh_pos = {}
