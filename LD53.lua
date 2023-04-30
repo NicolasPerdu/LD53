@@ -19,6 +19,9 @@ function BOOT()
  y_min=-1
  lifep = 100
  bp = {}
+
+ max_speed_x=1
+ max_speed_y=1
  
  --map
  map_gen=false
@@ -100,6 +103,12 @@ function BOOT()
   jw_box = {{bx=20,by=50,bw=8,bh=8},
   {bx=30,by=60,bw=8,bh=8},
   {bx=40,by=80,bw=8,bh=8}}
+  
+   -- speed boost
+  num_sp = 0
+  sp_enabled ={}
+  sp_pos = {}
+  sp_box = {}
   
   -- PERLIN NOISE
  cntSky=0
@@ -261,6 +270,19 @@ function perlin(i, j)
     intensity = math.floor(1 / (1 + math.exp(-(total -0.65)* 9)) * 7)
     return intensity
 end
+
+function collision_sp()
+	-- collision with speed boost
+	for i=1,num_sp do
+		if sp_enabled[i] then
+			if AABB(bp, sp_box[i]) then
+				sp_enabled[i]=false
+				max_speed_x = max_speed_x + 0.5
+				max_speed_y = max_speed_y + 0.5
+			end
+		end
+	 end
+	end
 
 function collision_jw()
 -- collision with jewel
@@ -440,7 +462,11 @@ function compute_sprite(angle, px, py, size, color)
 				if ens_enabled[j] then
     				-- collision bullet enemies
     				if AABB(bb, en_box[j]) then 
-   	 					ens_enabled[j] = false
+						num_sp = num_sp + 1
+						sp_enabled[num_sp] = true
+						sp_pos[num_sp] = {en_pos[j][1], en_pos[j][2]}
+						sp_box[num_sp] =  {bx=en_pos[j][1],by=en_pos[j][2],bw=8,bh=8}
+						ens_enabled[j] = false
      					shPos[i] = {-1,-1}
 						score = score + 1
     				end 
@@ -455,6 +481,14 @@ function compute_sprite(angle, px, py, size, color)
    			end
   		end
  	end
+end
+
+function render_sp()
+	for i=1,num_sp do
+		if sp_enabled[i] then
+			spr(6,sp_pos[i][1],sp_pos[i][1],0,1,0,0,1,1)
+		end
+	end 
 end
 
 function render_col_big_gun()
@@ -484,8 +518,13 @@ function render_col_big_gun()
 			if ens_enabled[j] then
     -- collision bullet enemies
     if AABB(bb, en_box[j]) then 
-   	 ens_enabled[j] = false
-     shPosBig[i] = {-1,-1}
+		num_sp = num_sp + 1
+		sp_enabled[num_sp] = true
+		sp_pos[num_sp] = {en_pos[j][1], en_pos[j][2]}
+		sp_box[num_sp] = {bx=en_pos[j][1],by=en_pos[j][2],bw=8,bh=8}
+	 	ens_enabled[j] = false
+		shPosBig[i] = {-1,-1}
+		score = score + 1
     end 
 			 shPosBigBox[i]=bb
 			end
@@ -570,8 +609,8 @@ function input_system()
 		end
 	end
 		
-	vx = clamp(vx, -1, 1)
-	vy = clamp(vy, -1, 1)
+	vx = clamp(vx, -max_speed_x, max_speed_x)
+	vy = clamp(vy, -max_speed_y, max_speed_y)
 end
 
 function check_render_timer()
@@ -644,6 +683,15 @@ for i=1,num_en do
 	 spr(3,en_pos[i][1],en_pos[i][2],0,1,0,0,1,1)
 	end
    end 
+end
+
+function render_jw()
+	for i=1,num_jw do
+		if jw_enabled[i] then
+		  --rectb(jw_box[i].bx,jw_box[i].by,jw_box[i].bw,jw_box[i].bh,2)
+		  spr(4,jw_pos[i][1],jw_pos[i][2],0,1,0,0,1,1)
+		 end
+		end
 end
 
 function TIC()
@@ -725,6 +773,7 @@ render_sky()
  end
  
  collision_jw()
+ collision_sp()
 	 
  --rectb(x_min, y_min, w, h, 2)
 	
@@ -746,12 +795,8 @@ render_sky()
 	render_col_small_gun()
 	render_col_big_gun()
  
- for i=1,num_jw do
- if jw_enabled[i] then
-   --rectb(jw_box[i].bx,jw_box[i].by,jw_box[i].bw,jw_box[i].bh,2)
-   spr(4,jw_pos[i][1],jw_pos[i][2],0,1,0,0,1,1)
-  end
- end
+	render_jw()
+	render_sp()
 	
  -- render the player
 	tri(a,b,c,d,e,f,color)
@@ -769,6 +814,8 @@ render_sky()
 	
  spr(5,220,10,0,1,0,dir_goal_buffer[index_goal],1,1)
  print("score: "..tostring(score),120,5, 0)
+
+ print("speed: "..tostring(max_speed_x),5,130, 0)
 	
  check_render_timer()
 
@@ -780,6 +827,7 @@ end
 -- 003:0055550005155150555115555515515555555555555115550515515000555500
 -- 004:200000020303303000444400034cc430034cc430004444000303303020000002
 -- 005:002cc20002cccc202cccccc2cc2cc2cc222cc222002cc200002cc200002cc200
+-- 006:00cccc000c0000000c00000000ccc00000000c0000000c0000000c000cccc000
 -- </TILES>
 
 -- <SPRITES>
