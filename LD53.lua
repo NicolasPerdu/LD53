@@ -84,6 +84,7 @@ function BOOT()
  time_win = 100
  timer_begin = -1 
  timer_buffer = -1
+ game_win = false
  game_over = false 
 
  --ui
@@ -833,14 +834,15 @@ function TIC()
  transition_map()
 
 -- RENDERING START
-cls(13)
+cls(9)
 
-if num_dir == index_goal then
-	print("MISSION COMPLETE!",84,84)
+if num_dir == index_goal or game_win then
+	game_win = true
+	print("MISSION COMPLETE!",30,60, 12, false, 2)
 	return
 end
 if game_over then
-	print("GAME OVER",84,84)
+	print("GAME OVER",70,60, 12, false, 2)
 	return
 end
 
