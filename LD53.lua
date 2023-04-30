@@ -62,8 +62,11 @@ function BOOT()
  w2_enabled={}
  
  --obstacle
+ num_os_min=2
+ num_os_max=5
  num_os=3
- os_enabled ={true, true, true}
+ os_life = {3, 3, 3}
+ os_enabled = {true, true, true}
  bos = {{bx=20,by=20,bw=28,bh=28},
  {bx=200,by=40,bw=8,bh=8},
  {bx=100,by=100,bw=10,bh=10}}
@@ -77,6 +80,7 @@ function BOOT()
   dir_goal_buffer[i] = math.random(0,3)
  end
  dir_goal =  dir_goal_buffer
+
  time_win = 100
  timer_begin = -1 
  timer_buffer = -1
@@ -86,6 +90,8 @@ function BOOT()
  score = 0
 
  --enemies
+ num_en_min=3
+ num_en_max=5
  num_en=3
  ens_enabled ={true, true, true}
  --bens = {{x1=0,y1=0,x2=10,y2=0,x3=5,y3=20},
@@ -137,8 +143,8 @@ function gen_wp()
 	w2_pos={}
  w1_enabled={}
  w2_enabled={}
- num_w1 = rd(0,1)
- num_w2 = rd(0,1)
+ num_w1 = rd(1,2)
+ num_w2 = rd(1,2)
  
  for i=1, num_w1 do
   w1_enabled[i]=true
@@ -166,29 +172,36 @@ end
 
 function gen_ob()
 	local rd = math.random
-	num_os=rd(1,10)
+	num_os=rd(num_os_min,num_os_max)
 	os_enabled={}
+	os_life={}
 	bos={}
 	for i=1, num_os do
 		os_enabled[i]=true
+		os_life[i]=3
 		bos[i]={bx=rd(1,240),
 		        by=rd(1,136),
-		        bw=rd(1,50),
-		        bh=rd(1,50)}
+		        bw=rd(5,30),
+		        bh=rd(5,30)}
 	end
 end 
 
 function gen_en()
 	local rd = math.random
   
-	num_en=rd(3,10)
+	num_en=rd(num_en_min,num_en_max)
 	ens_enabled={}
 	en_pos={}
 	en_box={}
 	
-	for i=1, num_os do
+	for i=1, num_en do
 		ens_enabled[i]=true
 		en_pos[i]={rd(1,240),rd(1,136)}
+		val=magnitude(x-en_pos[i][1], y-en_pos[i][2])
+		while (val < 20) do
+			en_pos[i]={rd(1,240),rd(1,136)}
+			val=magnitude(x-en_pos[i][1], y-en_pos[i][2])
+		end
 		en_box[i]={bx=en_pos[i][1],
 		           by=en_pos[i][2],
 		           bw=8,
@@ -451,7 +464,10 @@ function compute_sprite(angle, px, py, size, color)
    				if os_enabled[j] then
     			-- collision bullet obstacle
     				if AABB(bb, bos[j]) then 
-   	 					os_enabled[j] = false
+						os_life[j] = os_life[j]-1
+						if os_life[j] <= 0 then
+   	 						os_enabled[j] = false
+						end
      					shPos[i] = {-1,-1}
     				end
 			 		shPosBox[i]=bb
@@ -506,8 +522,11 @@ function render_col_big_gun()
    for j=1,num_os do
     if os_enabled[j] then
     -- collision bullet obstacle
-     if AABB(bb, bos[j]) then 
-    	 os_enabled[j] = false
+     if AABB(bb, bos[j]) then
+		 os_life[j] = os_life[j]-3
+		if os_life[j] <= 0 then
+   	 		os_enabled[j] = false
+		end
       shPosBig[i] = {-1,-1}
      end 
 			  shPosBigBox[i]=bb
@@ -786,7 +805,7 @@ render_sky()
 	y = y + vy
 	 
 	-- render obstacle
-	for j=1,num_os do
+	for j=1, num_os do
 	 if os_enabled[j] then
    rect(bos[j].bx,bos[j].by,bos[j].bw,bos[j].bh,2)
 	 end
