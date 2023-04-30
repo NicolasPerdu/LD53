@@ -79,6 +79,9 @@ function BOOT()
  timer_buffer = -1
  game_over = false 
 
+ --ui
+ score = 0
+
  --enemies
  num_en=3
  ens_enabled ={true, true, true}
@@ -264,7 +267,8 @@ function collision_jw()
 for i=1,num_jw do
 	if jw_enabled[i] then
 		if AABB(bp, jw_box[i]) then
-			jw_enabled[i]=false 
+			jw_enabled[i]=false
+			score = score + 3
 		end
 	end
  end
@@ -438,6 +442,7 @@ function compute_sprite(angle, px, py, size, color)
     				if AABB(bb, en_box[j]) then 
    	 					ens_enabled[j] = false
      					shPos[i] = {-1,-1}
+						score = score + 1
     				end 
 			 		shPosBox[i]=bb
 				end
@@ -589,6 +594,58 @@ function check_render_timer()
 	  print("time: "..tostring(rest),180,5,0)
 end
 
+function wp1_collision()
+-- collision with weapon 1
+for i=1, num_w1 do
+	if w1_enabled[i] then
+	 spr(1,w1_pos[i][1],w1_pos[i][2],0,1,0,0,1,1)
+		--rectb(w1_pos[i][1],w1_pos[i][2], 8, 8, 2)
+		bw1 = {
+			   bx= w1_pos[i][1], 
+			by= w1_pos[i][2],
+			bw= 8, 
+			bh= 8 
+		   }
+	 col_big = AABB(bp, bw1)
+	 if col_big then
+		 w1_enabled[i]=false
+	  sh_type = 1
+	 end
+	end
+   end
+end
+
+function wp2_collision()
+-- collision with weapon 2
+for i=1, num_w2 do
+	if w2_enabled[i] then
+	 spr(2,w2_pos[i][1],w2_pos[i][2],0,1,0,0,1,1)
+		--rectb(w2_pos[i][1], w2_pos[i][2], 8, 8, 2)
+	 bw2 = {
+			   bx= w2_pos[i][1], 
+			by= w2_pos[i][2],
+			bw= 8, 
+			bh= 8 
+		   }
+	 col_small = AABB(bp, bw2)
+	 if col_small then
+		 w2_enabled[i]=false
+	  sh_type = 2
+	 end
+	end
+   end
+end
+
+function render_enemies()
+-- render the enemies
+for i=1,num_en do 
+	if ens_enabled[i] then
+	 --rectb(en_box[i].bx,en_box[i].by,en_box[i].bw,en_box[i].bh,2)
+	 spr(3,en_pos[i][1],en_pos[i][2],0,1,0,0,1,1)
+	end
+   end 
+end
+
 function TIC()
 
 	gen_random_map()
@@ -633,8 +690,8 @@ end
 
 render_sky()
 
-print("life : "..tostring(lifep),84,84, 0)
-print("life : "..tostring(game_over),84,104, 0)
+--print("life : "..tostring(lifep),84,84, 0)
+--print("life : "..tostring(game_over),84,104, 0)
 	--print("x, y : "..xmouse..", "..ymouse,84,50)
 	--print("angle : "..angle,84,84)
 	
@@ -676,7 +733,6 @@ print("life : "..tostring(game_over),84,104, 0)
 
 	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
 	
-
 	x = x + vx
 	y = y + vy
 	 
@@ -697,69 +753,23 @@ print("life : "..tostring(game_over),84,104, 0)
   end
  end
 	
+ -- render the player
 	tri(a,b,c,d,e,f,color)
  
- -- render the enemies
- for i=1,num_en do 
-  --tri(bens[i].x1,
-  --bens[i].y1,
-  --bens[i].x2,
-  --bens[i].y2,
-  --bens[i].x3,
-  --bens[i].y3,
-  --color)
-  if ens_enabled[i] then
-   --rectb(en_box[i].bx,en_box[i].by,en_box[i].bw,en_box[i].bh,2)
-   spr(3,en_pos[i][1],en_pos[i][2],0,1,0,0,1,1)
-  end
- end 
+ render_enemies()
  
- 
- -- collision with weapon 1
- for i=1, num_w1 do
-  if w1_enabled[i] then
-   spr(1,w1_pos[i][1],w1_pos[i][2],0,1,0,0,1,1)
-	  --rectb(w1_pos[i][1],w1_pos[i][2], 8, 8, 2)
-  	bw1 = {
-         	bx= w1_pos[i][1], 
-          by= w1_pos[i][2],
-          bw= 8, 
-          bh= 8 
-         }
-   col_big = AABB(bp, bw1)
-   if col_big then
-  	 w1_enabled[i]=false
-    sh_type = 1
-   end
-  end
- end
- 
- -- collision with weapon 2
- for i=1, num_w2 do
-  if w2_enabled[i] then
-   spr(2,w2_pos[i][1],w2_pos[i][2],0,1,0,0,1,1)
-	  --rectb(w2_pos[i][1], w2_pos[i][2], 8, 8, 2)
-   bw2 = {
- 	        bx= w2_pos[i][1], 
-          by= w2_pos[i][2],
-          bw= 8, 
-          bh= 8 
-         }
-   col_small = AABB(bp, bw2)
-   if col_small then
- 	  w2_enabled[i]=false
-    sh_type = 2
-   end
-  end
- end
+ wp1_collision()
+ wp2_collision()
 
+ -- display life
  rect(10,10,lifep//2,5,2)
  
  -- goal
  --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
 	
  spr(5,220,10,0,1,0,dir_goal_buffer[index_goal],1,1)
-
+ print("score: "..tostring(score),120,5, 0)
+	
  check_render_timer()
 
 end
