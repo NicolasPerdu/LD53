@@ -121,6 +121,12 @@ function BOOT()
    cl_enabled ={}
    cl_pos = {}
    cl_box = {}
+
+   -- time boost
+   num_tm = 0
+   tm_enabled = {}
+   tm_pos = {}
+   tm_box = {}
   
   -- PERLIN NOISE
  cntSky=0
@@ -301,6 +307,18 @@ function collision_cl()
 		end
 	 end
 	end
+
+	function collision_tm()
+		-- collision with speed boost
+		for i=1,num_tm do
+			if tm_enabled[i] then
+				if AABB(bp, tm_box[i]) then
+					tm_enabled[i]=false
+					timer_begin = timer_begin + 10000
+				end
+			end
+		 end
+		end
 
 function collision_sp()
 	-- collision with speed boost
@@ -501,6 +519,11 @@ function compute_sprite(angle, px, py, size, color)
 						os_life[j] = os_life[j]-1
 						if os_life[j] <= 0 then
    	 						os_enabled[j] = false
+							--spawn time 
+							num_tm = num_tm + 1				
+							tm_enabled[num_tm] = true
+							tm_pos[num_tm] = {bos[j].bx, bos[j].by}
+							tm_box[num_tm] =  {bx=bos[j].bx,by=bos[j].by,bw=8,bh=8}
 						end
      					shPos[i] = {-1,-1}
     				end
@@ -543,7 +566,16 @@ function render_cl()
 	for i=1,num_cl do
 		if cl_enabled[i] then
 			--rectb(cl_box[i].bx,cl_box[i].by,cl_box[i].bw,cl_box[i].bh, 2)
-			spr(6,cl_pos[i][1],cl_pos[i][2],0,1,0,0,1,1)
+			spr(7,cl_pos[i][1],cl_pos[i][2],0,1,0,0,1,1)
+		end
+	end 
+end
+
+function render_tm()
+	for i=1,num_tm do
+		if tm_enabled[i] then
+			--rectb(cl_box[i].bx,cl_box[i].by,cl_box[i].bw,cl_box[i].bh, 2)
+			spr(8,tm_pos[i][1],tm_pos[i][2],0,1,0,0,1,1)
 		end
 	end 
 end
@@ -851,6 +883,7 @@ render_sky()
  collision_jw()
  collision_sp()
  collision_cl()
+ collision_tm()
 	 
  --rectb(x_min, y_min, w, h, 2)
 	
@@ -869,6 +902,7 @@ render_sky()
 	render_jw()
 	render_sp()
 	render_cl()
+	render_tm()
 	
  -- render the player
 	tri(a,b,c,d,e,f,color)
@@ -902,6 +936,7 @@ end
 -- 005:002cc20002cccc202cccccc2cc2cc2cc222cc222002cc200002cc200002cc200
 -- 006:00000000000ccc0000c00000000c00000000c00000000c0000ccc00000000000
 -- 007:00000000000cccc000c000000c0000000c00000000c00000000cccc000000000
+-- 008:000000000cccccc00cccccc0000cc000000cc000000cc000000cc00000000000
 -- </TILES>
 
 -- <SPRITES>
