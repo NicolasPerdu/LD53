@@ -18,6 +18,7 @@ function BOOT()
  x_min=-1
  y_min=-1
  lifep = 100
+ bp = {}
  
  --map
  map_gen=false
@@ -72,8 +73,12 @@ function BOOT()
  for i=1, num_dir do
   dir_goal_buffer[i] = math.random(0,3)
  end
- dir_goal =  dir_goal_buffer 
- 
+ dir_goal =  dir_goal_buffer
+ time_win = 100
+ timer_begin = -1 
+ timer_buffer = -1
+ game_over = false 
+
  --enemies
  num_en=3
  ens_enabled ={true, true, true}
@@ -254,14 +259,18 @@ function perlin(i, j)
     return intensity
 end
 
--- PERLIN NOISE FUNCTION END
-
-function get_current_goal()
-	i = 1
-	while(dir_goal_buffer[i] == -1) do
-	   i=i+1
+function collision_jw()
+-- collision with jewel
+for i=1,num_jw do
+	if jw_enabled[i] then
+		if AABB(bp, jw_box[i]) then
+			jw_enabled[i]=false 
+		end
 	end
+ end
 end
+
+-- PERLIN NOISE FUNCTION END
 
 function update_goal(dir)
 	if dir_goal_buffer[index_goal]==dir then
@@ -328,6 +337,44 @@ function AABB(b1, b2)
 	end 
 end
 
+function shooting(xmouse, ymouse)
+	if not shoot then
+		i = 1
+	 if sh_type==2 then 
+		 while (shPos[i][1]>0) do
+			 i = i+1
+		 end
+	 elseif sh_type==1 then
+	  while (shPosBig[i][1]>0) do
+			 i = i+1
+		 end
+	 end 
+	
+		if i<sh_max then
+		 if sh_type==2 then
+		  sfx (19,14,10,1,15,4) 
+	   dirShoot[i] = norm({xmouse-x, ymouse-y})
+		  shPos[i] = {x, y}
+		  shoot = true
+	  
+	   -- recoil
+	   x=x-dirShoot[i][1]
+	   y=y-dirShoot[i][2]
+	  elseif sh_type==1 then
+		  sfx (19,14,10,1,15,4)
+	   dirShootBig[i] = norm({xmouse-x, ymouse-y})
+		  shPosBig[i] = {x, y}
+		  shoot = true
+	  
+	   -- recoil
+	   recoil=2
+	   x=x-dirShootBig[i][1]*recoil
+	   y=y-dirShootBig[i][2]*recoil
+	  end
+		end
+	end
+end
+
 function compute_sprite(angle, px, py, size, color)
 	local math_cos = math.cos
 	local math_sin = math.sin
@@ -362,240 +409,51 @@ function compute_sprite(angle, px, py, size, color)
  
  function clamp(n, low, high) return math.min(math.max(n, low), high) end
 
-function TIC()
-
-	if not map_gen then
-		gen_ob()
-		gen_en()
-		gen_jw()
-		gen_wp()
-		map_gen=true 
-	end
-	
--- crosshair cursor
-	poke(0x3FFB,1)	
-	
--- input system for the player
-	local xmouse,ymouse,left,middle,right,scrollx,scrolly=mouse()
-	
-	if btn(0) then
-	 vy=vy-0.2
-	--	sfx (28,12,-1,0,2,4)
- end
-	if btn(1) then
-	 vy=vy+0.2
-	--	sfx (28,12,-1,0,2,4)
- end
-	if btn(2) then
-	 vx=vx-0.2
-	--	sfx (28,12,-1,0,2,4)
- end
-	if btn(3) then
-	 vx=vx+0.2
-	--	sfx (28,12,-1,0,2,4)
- end
-	
-	if not btn(0) 
-		and not btn(1)
-		and not btn(2)
-		and not btn(3) then 
-		cst = 0.05
-		if vx>0 then
-		 vx = math.max(0, vx - cst)
-		else
-			vx = math.min(0, vx + cst)
-		end
-		
-		if vy>0 then
-			vy = math.max(0, vy - cst)
-		else 
-		 vy = math.min(0, vy + cst)
-		end
-	end
-		
-	vx = clamp(vx, -1, 1)
-	vy = clamp(vy, -1, 1)
-	
- if left then
- 	if not shoot then
-  	i = 1
-   if sh_type==2 then 
-  	 while (shPos[i][1]>0) do
-  		 i = i+1
-  	 end
-   elseif sh_type==1 then
-    while (shPosBig[i][1]>0) do
-  		 i = i+1
-  	 end
-   end 
-  
-  	if i<sh_max then
-  	 if sh_type==2 then
-   	 sfx (19,14,10,1,15,4) 
-     dirShoot[i] = norm({xmouse-x, ymouse-y})
-  	  shPos[i] = {x, y}
-  	  shoot = true
-    
-     -- recoil
-     x=x-dirShoot[i][1]
-     y=y-dirShoot[i][2]
-    elseif sh_type==1 then
-    	sfx (19,14,10,1,15,4)
-     dirShootBig[i] = norm({xmouse-x, ymouse-y})
-  	  shPosBig[i] = {x, y}
-  	  shoot = true
-    
-     -- recoil
-     recoil=2
-     x=x-dirShootBig[i][1]*recoil
-     y=y-dirShootBig[i][2]*recoil
-    end
-  	end
-  end
- end
- 
- if shoot then
- 	if sh_auto_buf >= sh_auto_delay then
- 		shoot = false
-   sh_auto_buf = 0
- 	else 
- 		sh_auto_buf = sh_auto_buf+1
-  end
- end
- 
- transition_map()
-
-	cls(13)
- 	
-	-- check for victory
-	if num_dir == index_goal then
-	 print("MISSION COMPLETE!",84,84)
-	 return
-	end 
-
-	render_sky()
- --spr(1+t%60//30*2,x,y,14,3,0,0,2,2)
-	--print("HELLO WORLD!",84,84)
-	
-	angleRad = math.atan2(y-ymouse,x-xmouse)
-	angle = (angleRad * 180 / math.pi + 360) %360
-	--print("x, y : "..xmouse..", "..ymouse,84,50)
-	--print("angle : "..angle,84,84)
-	
-	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
-	w=x_max-x_min
-	h=y_max-y_min
-	
-	bp = {
- 	bx= x_min, 
-  by= y_min,
-  bw= w, 
-  bh= h 
- }
- 
- -- input system for the enemy
- speed_en = 0.2
- for i=1,num_en do
- 	if ens_enabled[i] then
- 	 dir = norm({x-en_pos[i][1], y-en_pos[i][2]})
- 	 en_pos[i]= {en_pos[i][1]+ dir[1]*speed_en,en_pos[i][2]+ dir[2]*speed_en} 
-   en_box[i].bx=en_pos[i][1]
-   en_box[i].by=en_pos[i][2]
-  
-   if AABB(bp, en_box[i]) then
-	lifep= lifep-4
-		 end
-		end
- end
- 
- -- collision with jewel
- for i=1,num_jw do
- 	if jw_enabled[i] then
-   if AABB(bp, jw_box[i]) then
-			 jw_enabled[i]=false 
-		 end
-		end
- end
-	 
- --rectb(x_min, y_min, w, h, 2)
-	
-	-- obstacles collision
-	for j=1,num_os do
-	 if os_enabled[j] and AABB(bp, bos[j]) then
-	 	xp = x + vx
- 	 yp = y + vy
-   a2,b2,c2,d2,e2,f2,color2 = compute_sprite(math.pi + angleRad, xp, yp,10, 12)
-	  w2=x_max-x_min
-	  h2=y_max-y_min
-		
-		 bp = {
- 	  bx= x_min, 
-    by= y_min,
-    bw= w, 
-    bh= h 
-   }
-		
-		 if AABB(bp, bos[j]) then
-			 vx=-0.5*vx
-			 vy=-0.5*vy
-		 end
-	 end
- end	
-	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
-	
-
-	x = x + vx
-	y = y + vy
-	 
-	-- render obstacle
-	for j=1,num_os do
-	 if os_enabled[j] then
-   rect(bos[j].bx,bos[j].by,bos[j].bw,bos[j].bh,2)
-	 end
-	end
-	
+ function render_col_small_gun()
 	for i=1,sh_max do
 		if shPos[i][1] > 0 then
 			pix(shPos[i][1],shPos[i][2], 12)
 		
 			bb = {
- 	  bx= shPos[i][1]-1, 
-    by= shPos[i][2]-1,
-    bw= 2, 
-    bh= 2 
-   }
+ 	  			bx= shPos[i][1]-1, 
+    			by= shPos[i][2]-1,
+    			bw= 2, 
+    			bh= 2 
+   			}
    
-   for j=1,num_os do
-   if os_enabled[j] then
-    -- collision bullet obstacle
-    if AABB(bb, bos[j]) then 
-   	 os_enabled[j] = false
-     shPos[i] = {-1,-1}
-    end
-			 shPosBox[i]=bb
-			end
+   			for j=1,num_os do
+   				if os_enabled[j] then
+    			-- collision bullet obstacle
+    				if AABB(bb, bos[j]) then 
+   	 					os_enabled[j] = false
+     					shPos[i] = {-1,-1}
+    				end
+			 		shPosBox[i]=bb
+				end
 			end
 			
 			for j=1,num_en do
-			if ens_enabled[j] then
-    -- collision bullet enemies
-    if AABB(bb, en_box[j]) then 
-   	 ens_enabled[j] = false
-     shPos[i] = {-1,-1}
-    end 
-			 shPosBox[i]=bb
-			end
+				if ens_enabled[j] then
+    				-- collision bullet enemies
+    				if AABB(bb, en_box[j]) then 
+   	 					ens_enabled[j] = false
+     					shPos[i] = {-1,-1}
+    				end 
+			 		shPosBox[i]=bb
+				end
 			end
 		
 			--rectb(bb.bx, bb.by, bb.bw, bb.bh,2)
 			shPos[i]={shPos[i][1]+ dirShoot[i][1],shPos[i][2]+ dirShoot[i][2]}
- 	 if shPos[i][1]>240 or shPos[i][2]>136 then
-    shPos[i] = {-1,-1}
-   end
-  end
- end
- 
- for i=1,sh_max do
+ 	 		if shPos[i][1]>240 or shPos[i][2]>136 then
+    			shPos[i] = {-1,-1}
+   			end
+  		end
+ 	end
+end
+
+function render_col_big_gun()
+	for i=1,sh_max do
 		if shPosBig[i][1] > 0 then
 			circ(shPosBig[i][1],shPosBig[i][2],5, 12)
 			
@@ -635,6 +493,202 @@ function TIC()
    end
   end
  end
+end
+
+function obstacle_collision()
+	for j=1,num_os do
+		if os_enabled[j] and AABB(bp, bos[j]) then
+			xp = x + vx
+		 yp = y + vy
+	  a2,b2,c2,d2,e2,f2,color2 = compute_sprite(math.pi + angleRad, xp, yp,10, 12)
+		 w2=x_max-x_min
+		 h2=y_max-y_min
+		   
+			bp = {
+		  bx= x_min, 
+	   by= y_min,
+	   bw= w, 
+	   bh= h 
+	  }
+		   
+			if AABB(bp, bos[j]) then
+				vx=-0.5*vx
+				vy=-0.5*vy
+			end
+		end
+	end	
+end
+
+function gen_random_map()
+	if not map_gen then
+		gen_ob()
+		gen_en()
+		gen_jw()
+		gen_wp()
+		map_gen=true 
+	end
+end
+
+function input_system()
+	if btn(0) then
+		vy=vy-0.2
+		--	sfx (28,12,-1,0,2,4)
+ 	end
+	if btn(1) then
+		vy=vy+0.2
+		--	sfx (28,12,-1,0,2,4)
+ 	end
+	if btn(2) then
+	 vx=vx-0.2
+	--	sfx (28,12,-1,0,2,4)
+ end
+	if btn(3) then
+	 vx=vx+0.2
+	--	sfx (28,12,-1,0,2,4)
+ end
+	
+	if not btn(0) 
+		and not btn(1)
+		and not btn(2)
+		and not btn(3) then 
+		cst = 0.05
+		if vx>0 then
+		 vx = math.max(0, vx - cst)
+		else
+			vx = math.min(0, vx + cst)
+		end
+		
+		if vy>0 then
+			vy = math.max(0, vy - cst)
+		else 
+		 vy = math.min(0, vy + cst)
+		end
+	end
+		
+	vx = clamp(vx, -1, 1)
+	vy = clamp(vy, -1, 1)
+end
+
+function check_render_timer()
+	if timer_buffer > 0 then
+		timer_buffer = time()
+	 end
+	
+	 if timer_begin < 0 then 
+	  timer_begin = time()
+	  timer_buffer = timer_begin
+	 end
+	
+	  diff_time = math.floor((timer_buffer-timer_begin)/1000)
+	  rest = time_win-diff_time
+	
+	  if rest <= 0 then
+		game_over = true
+	  end
+	
+	  print("time: "..tostring(rest),180,5,0)
+end
+
+function TIC()
+
+	gen_random_map()
+	
+  	-- crosshair cursor
+	poke(0x3FFB,1)	
+	
+	-- input system for the player
+	local xmouse,ymouse,left,middle,right,scrollx,scrolly=mouse()
+	
+	input_system()
+	
+ if left then
+ 	shooting(xmouse,ymouse)
+ end
+ 	-- need to be after the recoil to have the last position x and y 
+ 	angleRad = math.atan2(y-ymouse,x-xmouse)
+	angle = (angleRad * 180 / math.pi + 360) %360
+ 
+ if shoot then
+ 	if sh_auto_buf >= sh_auto_delay then
+ 		shoot = false
+   sh_auto_buf = 0
+ 	else 
+ 		sh_auto_buf = sh_auto_buf+1
+  end
+ end
+ 
+ transition_map()
+
+-- RENDERING START
+cls(13)
+
+if num_dir == index_goal then
+	print("MISSION COMPLETE!",84,84)
+	return
+end
+if game_over then
+	print("GAME OVER",84,84)
+	return
+end
+
+render_sky()
+
+print("life : "..tostring(lifep),84,84, 0)
+print("life : "..tostring(game_over),84,104, 0)
+	--print("x, y : "..xmouse..", "..ymouse,84,50)
+	--print("angle : "..angle,84,84)
+	
+	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
+	w=x_max-x_min
+	h=y_max-y_min
+	
+	bp = {
+ 		bx= x_min, 
+  		by= y_min,
+  		bw= w, 
+  		bh= h 
+ 	}
+ 
+ -- input system for the enemy
+ speed_en = 0.2
+ for i=1,num_en do
+ 	if ens_enabled[i] then
+ 		dir = norm({x-en_pos[i][1], y-en_pos[i][2]})
+ 		en_pos[i]= {en_pos[i][1]+ dir[1]*speed_en,en_pos[i][2]+ dir[2]*speed_en} 
+   		en_box[i].bx=en_pos[i][1]
+   		en_box[i].by=en_pos[i][2]
+  
+   		if AABB(bp, en_box[i]) then
+			lifep= lifep-1
+			if lifep < 0 then
+				game_over = true
+			end
+		end
+	end
+ end
+ 
+ collision_jw()
+	 
+ --rectb(x_min, y_min, w, h, 2)
+	
+	-- obstacles collision
+	obstacle_collision()
+
+	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
+	
+
+	x = x + vx
+	y = y + vy
+	 
+	-- render obstacle
+	for j=1,num_os do
+	 if os_enabled[j] then
+   rect(bos[j].bx,bos[j].by,bos[j].bw,bos[j].bh,2)
+	 end
+	end
+	
+	render_col_small_gun()
+	render_col_big_gun()
  
  for i=1,num_jw do
  if jw_enabled[i] then
@@ -705,6 +759,9 @@ function TIC()
  --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
 	
  spr(5,220,10,0,1,0,dir_goal_buffer[index_goal],1,1)
+
+ check_render_timer()
+
 end
 
 -- <TILES>
