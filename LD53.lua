@@ -1002,15 +1002,15 @@ function check_render_timer()
 		game_over = true
 	  end
 	
-	  local begin_pos = 190
-	  local begin_y = 110
+	  local begin_pos = 173
+	  local begin_y = 1
 	  spr(289,begin_pos,begin_y,0,1,0,0,3,1)
 
  	  num5 = rest % 10;
  	  num4 = (rest // 10) % 10;
       num3 = (rest // 100) % 10;
 
-	  begin_pos = begin_pos + 24
+	  begin_pos = begin_pos + 23
 	  
       spr(get_id_number(num3),begin_pos,begin_y,0,1,0,0,1,1)
       spr(get_id_number(num4),begin_pos+8,begin_y,0,1,0,0,1,1)
@@ -1057,10 +1057,10 @@ function check_render_timer_fare()
 	  end
 	end
 
-	  local begin_pos = 190
-	  local begin_y = 120
-	  spr(278,begin_pos,begin_y,0,1,0,0,3,1)
-	  begin_pos = begin_pos + 26
+	  local begin_pos = 162
+	  local begin_y = 10
+	  spr(277,begin_pos,begin_y,0,1,0,0,4,1)
+	  begin_pos = begin_pos + 34
 
 	  num5 = rest % 10;
  	  num4 = (rest // 10) % 10;
@@ -1301,8 +1301,8 @@ function update_inv_frame()
 end
 
 function render_mult_score()
-	begin_x = 160
-	begin_y = 0
+	begin_x = 176
+	begin_y = 109
    
 	spr(273,begin_x,begin_y,0,1,0,0,4,1)
 
@@ -1318,17 +1318,17 @@ function render_mult_score()
 end
 
 function render_fare_score()
-	begin_x = 80
-	begin_y = 0
+	begin_x = 173
+	begin_y = 127
    
-	spr(278,begin_x,begin_y,0,1,0,0,4,1)
+	spr(277,begin_x,begin_y,0,1,0,0,4,1)
 
 	num5 = fare_score % 10;
 	num4 = (fare_score // 10) % 10;
 	num3 = (fare_score // 100) % 10;
 	num2 = (fare_score // 1000) % 10;
 	--num1 = (score // 10000) % 10;
-	begin_x = begin_x + 28
+	begin_x = begin_x + 34
    
 	spr(get_id_number(num2),begin_x, begin_y,0,1,0,0,1,1)
 	spr(get_id_number(num3),begin_x + 8, begin_y,0,1,0,0,1,1)
@@ -1337,8 +1337,8 @@ function render_fare_score()
 end
 
 function render_score()
-	begin_x = 2
-	begin_y = 0
+	begin_x = 172
+	begin_y = 118
    
 	spr(261,begin_x,begin_y,0,1,0,0,4,1)
 	num5 = score % 10;
@@ -1412,8 +1412,8 @@ function collision_en_mv()
 end
 
 function render_boost()
-	local begin_x = 0
-	local begin_y = 110
+	local begin_x = 1
+	local begin_y = 118
 	spr(352,begin_x,begin_y,0,1,0,0,4,1)
 	begin_x = begin_x + 35
 	num5 = sh_auto_delay % 10;
@@ -1424,8 +1424,8 @@ function render_boost()
 end
 
 function render_speed()
-	local begin_x = 0
-	local begin_y = 120
+	local begin_x = 1
+	local begin_y = 127
 	spr(357,begin_x,begin_y,0,1,0,0,4,1)
 	begin_x = begin_x + 35
 	num = math.floor(max_speed_x)
@@ -1582,7 +1582,7 @@ render_sky()
  --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
 
  if not goal_enabled and not payload_enabled then
- 	spr(5,220,10,0,2,0,dir_goal_buffer[index_goal],1,1)
+ 	spr(5,222,2,0,2,0,dir_goal_buffer[index_goal],1,1)
  end
 
  -- display score
@@ -1618,7 +1618,7 @@ end
 -- <SPRITES>
 -- 001:ccf00fccfcf00fcf0fc00cf000000000000000000fc00cf0fcf00fcfccf00fcc
 -- 002:00fccf00000ff000f000000fcf0000fccf0000fcf000000f000ff00000fccf00
--- 005:ffffffff0ffccccf0fcfffff0ffcccff0fffffcf0fccccff0fffffff00000000
+-- 005:0fffffff0ffccccf0fcfffff0ffcccff0fffffcf0fccccff0fffffff00000000
 -- 006:fffffffffccccffccfffffcfcfffffcfcfffffcffccccffcffffffff00000000
 -- 007:ffffffffccffccccffcfcfffffcfccccffcfcffcccffcfffffffffff00000000
 -- 008:ffffffffffcccccfcfcfffffffcccccfffcfffffcfcccccfffffffff00000000
@@ -1629,11 +1629,11 @@ end
 -- 013:fffffffffcfffffcfcfffffcfcfffffcfcfffffcfcccccfcffffffff00000000
 -- 014:fffffffffcccccfcfcfffffcfcccccfcfcfffffcfcfffffcffffffff00000000
 -- 015:fffff000ccccf000fffff000ccccf000fffff000ccccf000fffff00000000000
--- 017:ffffffff0fcfffcf0fccfccf0fcfcfcf0fcfffcf0fcfffcf0fffffff00000000
+-- 017:0fffffff0fcfffcf0fccfccf0fcfcfcf0fcfffcf0fcfffcf0fffffff00000000
 -- 018:ffffffffcfffcfcfcfffcfcfcfffcfcfcfffcfcffcccffccffffffff00000000
 -- 019:ffffffffffffccccffffffcfffffffcfffffffcfcccfffcfffffffff00000000
 -- 020:ffff0000cfcf0000ffcf0000ffcf0000ffcf0000ffcf0000ffff000000000000
--- 021:ffffffff0000000f0000000f0000000f0000000f0000000f0000000f00000000
+-- 021:0000000f0000000f0000000f0000000f0000000f0000000f0000000f00000000
 -- 022:ffffffffcccccffccfffffcfcccccfcccfffffcfcfffffcfffffffff00000000
 -- 023:ffffffffccffccccffcfcfffcccfccccffcfcffcffcfcfffffffffff00000000
 -- 024:ffffffffffcccccfcfcfffffffcccccfffcfffffcfcccccfffffffff00000000
@@ -1645,7 +1645,7 @@ end
 -- 032:00fff0000f666f000f666f000f666f000f666f000f666f000f666f0000fff000
 -- 033:fffffffffcccccfcfffcfffcfffcfffcfffcfffcfffcfffcffffffff00000000
 -- 034:fffffffffcfffcfcfccfccfcfcfcfcfcfcfffcfcfcfffcfcffffffff00000000
--- 035:ffffffffccccf000fffff000ccccf000fffff000ccccf000fffff00000000000
+-- 035:fffff000ccccf000fffff000ccccf000fffff000ccccf000fffff00000000000
 -- 037:000000000000ffff0000fcff0000fccf0000fcfc0000fcff0000fcff0000ffff
 -- 038:00000000fffffffffcffffccccfffcfffcfffcfffcfffcfffcfcffccffffffff
 -- 039:00000000ffffffffccfcfffcfffcfffcccfcfffcfcfcfffcccffcccfffffffff
