@@ -849,7 +849,13 @@ function gen_random_map()
 		sp_enabled ={}
  		sp_pos = {}
   		sp_box = {}
-		shPos = {}
+		  sh_max = 100
+		  for i=1,sh_max do
+		   dirShoot[i]={-1,-1}
+		   shPos[i]={-1,-1}
+		   dirShootBig[i]={-1,-1}
+		   shPosBig[i]={-1,-1}
+		  end
 		en_sh_bullet_pos = {}
 		en_sh_bullet_box = {}
 
