@@ -573,7 +573,7 @@ function shooting(xmouse, ymouse)
 	   	  vx=vx-dirShootBig[i][1]*recoil
 		  vx=clamp(vx, -1, 1)
 	   	  vy=vy-dirShootBig[i][2]*recoil
-		  vy=clamp(vx, -1, 1)
+		  vy=clamp(vy, -1, 1)
 		  num_ini_a_x = 0
 		  num_ini_a_y = 0
 	  end
@@ -798,8 +798,7 @@ function render_col_big_gun()
 			for j=1,num_en do
 				if ens_enabled[j] then
     				-- collision bullet enemies
-    				if AABB(bb, en_box[j]) then
-      sfx (28,25,16,2,7,5)  
+    				if AABB(bb, en_box[j]) then 
 						gen_boost(j)
 	 					ens_enabled[j] = false
 						shPosBig[i] = {-1,-1}
@@ -812,8 +811,7 @@ function render_col_big_gun()
 			for j=1,num_en_sh do
 				if ens_sh_enabled[j] then
     				-- collision bullet enemies
-    				if AABB(bb, en_sh_box[j]) then
-      sfx (28,25,16,2,7,5)  
+    				if AABB(bb, en_sh_box[j]) then 
 						gen_boost_sh(j)
 	 					ens_sh_enabled[j] = false
 						shPosBig[i] = {-1,-1}
