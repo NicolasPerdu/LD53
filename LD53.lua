@@ -849,6 +849,9 @@ function gen_random_map()
 		sp_enabled ={}
  		sp_pos = {}
   		sp_box = {}
+		shPos = {}
+		en_sh_bullet_pos = {}
+		en_sh_bullet_box = {}
 
    		num_cl = 0
    		cl_enabled ={}
@@ -1819,7 +1822,6 @@ end
 -- 045:0cf70cf70cf79c77cc20dc10ec00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00f8b000000000
 -- 046:8c000c00ac004c00dc008c00ec00ec00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc0071b000000000
 -- 047:0c002c005c008c00ac00dc00dc00ec00ec00ec00ec00ec00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc0010b000000000
--- 048:05000500050005000570057005700570057005c005c005c005c005c005c0f500f500f500f500f500f500f500f500f500f500f500f500f500f500f500500000000000
 -- </SFX>
 
 -- <PATTERNS>
