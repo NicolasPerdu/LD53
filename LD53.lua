@@ -110,7 +110,7 @@ timer_begin_fare = -1
 timer_buffer_fare = -1
 
  --goal
- num_goal=3
+ --num_goal=3
  goal_pos={}
  goal_enabled=false
  num_dir=4
@@ -1229,7 +1229,7 @@ function render_goal()
 		radius = 10
 		if dist < radius then
 		
-			num_goal = num_goal - 1
+			--num_goal = num_goal - 1
 			
 			if type_goal == 1 then
 				fare_score = fare_score + 100
@@ -1513,14 +1513,15 @@ function TIC()
 -- RENDERING START
 cls(9)
 
-if num_goal == 0 or game_win then
-	game_win = true
-	print("MISSION COMPLETE!",30,60, 12, false, 2)
-	print("SCORE: "..tostring(score),70,90, 12, false, 2)
-	return
-end
+--if num_goal == 0 or game_win then
+--	game_win = true
+--	print("MISSION COMPLETE!",30,60, 12, false, 2)
+--	print("SCORE: "..tostring(score),70,90, 12, false, 2)
+--	return
+--end
 if game_over then
 	print("GAME OVER",70,60, 12, false, 2)
+	print("SCORE: "..tostring(score),70,90, 12, false, 2)
 	return
 end
 
