@@ -1459,7 +1459,7 @@ render_sky()
 
  update_inv_frame()
 	 
- rectb(bp.bx, bp.by, bp.bw, bp.bh, 2)
+ --rectb(bp.bx, bp.by, bp.bw, bp.bh, 2)
 	
 	-- obstacles collision
 	obstacle_collision()
