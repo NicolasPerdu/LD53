@@ -552,7 +552,9 @@ function shooting(xmouse, ymouse)
 	   -- recoil
 	   recoil=1.5
 	   vx=vx-dirShoot[i][1]*recoil
+	   vy=clamp(vx, -1, 1)
 	   vy=vy-dirShoot[i][2]*recoil
+	   vy=clamp(vy, -1, 1)
 	   num_ini_a_x = 0
 	   num_ini_a_y = 0
 	  elseif sh_type==1 then
@@ -564,7 +566,9 @@ function shooting(xmouse, ymouse)
 	   	  -- recoil
 	   	  recoil=4
 	   	  vx=vx-dirShootBig[i][1]*recoil
+		  vx=clamp(vx, -1, 1)
 	   	  vy=vy-dirShootBig[i][2]*recoil
+		  vy=clamp(vx, -1, 1)
 		  num_ini_a_x = 0
 		  num_ini_a_y = 0
 	  end
@@ -624,7 +628,7 @@ function compute_sprite(angle, px, py, size, color)
 end 
 
  function gen_boost(j)
-	ch = math.random(2, 2)
+	ch = math.random(1, 2)
 	if(ch == 1) then 
 		num_sp = num_sp + 1				
 		sp_enabled[num_sp] = true
