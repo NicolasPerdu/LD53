@@ -38,7 +38,7 @@ function BOOT()
  --map
  map_gen=false
  margin = 10
- margin_ob = 50
+ margin_ob = 30
  
   --bgm
 -- music(0,0,0,true,true)
@@ -104,7 +104,7 @@ timer_buffer_fare = -1
  num_goal=3
  goal_pos={}
  goal_enabled=false
- num_dir=3
+ num_dir=4
  dir_goal={}
  dir_goal_buffer={}
  index_goal = 1
@@ -950,7 +950,7 @@ function check_render_timer()
 		game_over = true
 	  end
 	
-	  local begin_pos = 180
+	  local begin_pos = 190
 	  local begin_y = 110
 	  spr(289,begin_pos,begin_y,0,1,0,0,3,1)
 
@@ -991,10 +991,10 @@ function check_render_timer_fare()
 	  end
 	end
 
-	  local begin_pos = 180
+	  local begin_pos = 190
 	  local begin_y = 120
 	  spr(278,begin_pos,begin_y,0,1,0,0,3,1)
-	  begin_pos = begin_pos + 28
+	  begin_pos = begin_pos + 26
 
 	  num5 = rest % 10;
  	  num4 = (rest // 10) % 10;
@@ -1123,7 +1123,7 @@ function render_payload()
 			payload_picked = true
 			timer_begin_fare = time()
 			time_win_fare = 90
-			type_goal = 2
+			type_goal = 1
 			fill_direction_goal()
 			payload_enabled = false
 		end
@@ -1141,7 +1141,7 @@ function render_payload()
 			payload_picked = true
 			timer_begin_fare = time()
 			time_win_fare = 30
-			type_goal = 2
+			type_goal = 3
 			fill_direction_goal()
 			payload_enabled = false
 		end
@@ -1158,7 +1158,16 @@ function render_goal()
 		radius = 10
 		if dist < radius then
 			num_goal = num_goal - 1
-			score = score + fare_score
+			
+			if type_goal == 1 then
+				fare_score = fare_score + 100
+			elseif type_goal == 2 then
+				fare_score = fare_score + 500
+			elseif type_goal == 3 then
+				fare_score = fare_score + 1000
+			end
+
+			score = score + fare_score 
 			fare_score = 0
 			timer_begin = timer_begin + 10000
 			type_goal = 1
@@ -1216,7 +1225,7 @@ function update_inv_frame()
 end
 
 function render_mult_score()
-	begin_x = 140
+	begin_x = 160
 	begin_y = 0
    
 	spr(273,begin_x,begin_y,0,1,0,0,4,1)
