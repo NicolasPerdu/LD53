@@ -72,14 +72,15 @@ function BOOT()
  {bx=100,by=100,bw=10,bh=10}}
 
  --goal
+ num_goal=3
+ goal_pos={}
+ goal_enabled=false
  num_dir=5
  dir_goal={}
  dir_goal_buffer={}
  index_goal = 1
- for i=1, num_dir do
-  dir_goal_buffer[i] = math.random(0,3)
- end
- dir_goal =  dir_goal_buffer
+
+ fill_direction_goal()
 
  time_win = 100
  timer_begin = -1 
@@ -164,6 +165,16 @@ function BOOT()
    			--mset(i//8,j//8,mp[i][j]%16)
   		end
  	end
+end
+
+function fill_direction_goal()
+	dir_goal={}
+	dir_goal_buffer={}
+	index_goal = 1
+	for i=1, num_dir do
+	 dir_goal_buffer[i] = math.random(0,3)
+	end
+	dir_goal =  dir_goal_buffer
 end
 
 function gen_wp()
@@ -965,8 +976,95 @@ for j=1, num_os do
    end
 end 
 
-function TIC()
+function render_goal()
+	if goal_enabled then
+		dist = magnitude(x-goal_pos[1], y-goal_pos[2])
+		radius = 10
+		if dist < radius then
+			num_goal = num_goal - 1
+			timer_begin = timer_begin + 10000
+			fill_direction_goal()
+			goal_enabled = false
+		end 
+		circb(goal_pos[1], goal_pos[2], radius, 12)
+	end
+end
 
+function collision_render_bullet()
+	speed_bul=1
+	for i=1,num_en do
+	   if ens_sh_enabled[i] then
+			for j=1,num_sh_bullet[i] do
+			   if en_sh_bullet_enabled[i][j] then
+				   en_sh_bullet_pos[i][j]= {en_sh_bullet_pos[i][j][1]+en_sh_bullet_dir[i][j][1]*speed_bul,
+										   en_sh_bullet_pos[i][j][2]+en_sh_bullet_dir[i][j][2]*speed_bul}
+				   en_sh_bullet_box[i][j]= {bx=en_sh_bullet_pos[i][j][1],by=en_sh_bullet_pos[i][j][2],bw=2,bh=2}
+				   
+				   if en_sh_bullet_pos[i][j][1]>240 or en_sh_bullet_pos[i][j][2]>136 or en_sh_bullet_pos[i][j][1]<0 or en_sh_bullet_pos[i][j][2]<0 then
+					   en_sh_bullet_enabled[i][j] = false
+				   end
+   
+				   pix(en_sh_bullet_pos[i][j][1], en_sh_bullet_pos[i][j][2], 12)
+				   -- rectb(en_sh_bullet_box[i][j].bx, en_sh_bullet_box[i][j].by, en_sh_bullet_box[i][j].bw, en_sh_bullet_box[i][j].bh, 2)
+   
+				   if AABB(bp, en_sh_bullet_box[i][j]) then
+					   lifep = lifep-2
+					   en_sh_bullet_enabled[i][j] = false
+					   if lifep < 0 then
+						   game_over = true
+					   end
+				   end
+			   end
+			end
+	   end
+   end
+end
+
+function collision_en()
+	for i=1,num_en_sh do
+		if ens_sh_enabled[i] then
+		   if en_sh_delay_shooting[i] < 100 then
+			   en_sh_delay_shooting[i] = en_sh_delay_shooting[i] + 1
+		   else -- shoot 
+			   en_sh_delay_shooting[i] = 0
+				dir = norm({x-en_sh_pos[i][1], y-en_sh_pos[i][2]})
+			   num_sh_bullet[i] = num_sh_bullet[i] + 1
+			   en_sh_bullet_enabled[i][num_sh_bullet[i]] = true
+				en_sh_bullet_pos[i][num_sh_bullet[i]] = {en_sh_pos[i][1],en_sh_pos[i][2]} 
+			   en_sh_bullet_dir[i][num_sh_bullet[i]] = {dir[1],dir[2]} 
+				  en_sh_bullet_box[i][num_sh_bullet[i]] = {bx=en_sh_bullet_pos[i][num_sh_bullet[i]][1],by=en_sh_bullet_pos[i][num_sh_bullet[i]][2],bw=2,bh=2}
+		   end
+   
+			  if AABB(bp, en_sh_box[i]) then
+			   lifep = lifep-1
+			   if lifep < 0 then
+				   game_over = true
+			   end
+		   end
+	   end
+	end
+end
+
+function collision_en_mv()
+	speed_en = 0.2
+	for i=1,num_en do
+		if ens_enabled[i] then
+			dir = norm({x-en_pos[i][1], y-en_pos[i][2]})
+			en_pos[i]= {en_pos[i][1]+ dir[1]*speed_en,en_pos[i][2]+ dir[2]*speed_en} 
+			  en_box[i].bx=en_pos[i][1]
+			  en_box[i].by=en_pos[i][2]
+	 
+			  if AABB(bp, en_box[i]) then
+			   lifep= lifep-1
+			   if lifep < 0 then
+				   game_over = true
+			   end
+		   end
+	   end
+	end
+end
+
+function TIC()
 	gen_random_map()
 	
   	-- crosshair cursor
@@ -998,7 +1096,7 @@ function TIC()
 -- RENDERING START
 cls(9)
 
-if num_dir == index_goal or game_win then
+if num_goal == 0 or game_win then
 	game_win = true
 	print("MISSION COMPLETE!",30,60, 12, false, 2)
 	print("SCORE: "..tostring(score),70,90, 12, false, 2)
@@ -1007,6 +1105,11 @@ end
 if game_over then
 	print("GAME OVER",70,60, 12, false, 2)
 	return
+end
+
+if num_dir == index_goal and not goal_enabled then
+	goal_pos = {math.random(20, 220), math.random(20, 116)}
+	goal_enabled = true
 end
 
 render_sky()
@@ -1028,78 +1131,13 @@ render_sky()
  	}
  
  -- input system for the enemy moving
- speed_en = 0.2
- for i=1,num_en do
- 	if ens_enabled[i] then
- 		dir = norm({x-en_pos[i][1], y-en_pos[i][2]})
- 		en_pos[i]= {en_pos[i][1]+ dir[1]*speed_en,en_pos[i][2]+ dir[2]*speed_en} 
-   		en_box[i].bx=en_pos[i][1]
-   		en_box[i].by=en_pos[i][2]
-  
-   		if AABB(bp, en_box[i]) then
-			lifep= lifep-1
-			if lifep < 0 then
-				game_over = true
-			end
-		end
-	end
- end
+ collision_en_mv()
 
  -- input system for the enemhy shooting
- for i=1,num_en_sh do
- 	if ens_sh_enabled[i] then
-		if en_sh_delay_shooting[i] < 100 then
-			en_sh_delay_shooting[i] = en_sh_delay_shooting[i] + 1
-		else -- shoot 
-			en_sh_delay_shooting[i] = 0
- 			dir = norm({x-en_sh_pos[i][1], y-en_sh_pos[i][2]})
-			num_sh_bullet[i] = num_sh_bullet[i] + 1
-			en_sh_bullet_enabled[i][num_sh_bullet[i]] = true
- 			en_sh_bullet_pos[i][num_sh_bullet[i]] = {en_sh_pos[i][1],en_sh_pos[i][2]} 
-			en_sh_bullet_dir[i][num_sh_bullet[i]] = {dir[1],dir[2]} 
-   			en_sh_bullet_box[i][num_sh_bullet[i]] = {bx=en_sh_bullet_pos[i][num_sh_bullet[i]][1],by=en_sh_bullet_pos[i][num_sh_bullet[i]][2],bw=2,bh=2}
-		end
+ collision_en()
 
-   		if AABB(bp, en_sh_box[i]) then
-			lifep = lifep-1
-			if lifep < 0 then
-				game_over = true
-			end
-		end
-	end
- end
-
-
-
- 
  -- update the bullets and render and collision with player
- speed_bul=1
- for i=1,num_en do
-	if ens_sh_enabled[i] then
- 		for j=1,num_sh_bullet[i] do
-			if en_sh_bullet_enabled[i][j] then
-				en_sh_bullet_pos[i][j]= {en_sh_bullet_pos[i][j][1]+en_sh_bullet_dir[i][j][1]*speed_bul,
-										en_sh_bullet_pos[i][j][2]+en_sh_bullet_dir[i][j][2]*speed_bul}
-				en_sh_bullet_box[i][j]= {bx=en_sh_bullet_pos[i][j][1],by=en_sh_bullet_pos[i][j][2],bw=2,bh=2}
-				
-				if en_sh_bullet_pos[i][j][1]>240 or en_sh_bullet_pos[i][j][2]>136 or en_sh_bullet_pos[i][j][1]<0 or en_sh_bullet_pos[i][j][2]<0 then
-					en_sh_bullet_enabled[i][j] = false
-				end
-
-				pix(en_sh_bullet_pos[i][j][1], en_sh_bullet_pos[i][j][2], 12)
-				-- rectb(en_sh_bullet_box[i][j].bx, en_sh_bullet_box[i][j].by, en_sh_bullet_box[i][j].bw, en_sh_bullet_box[i][j].bh, 2)
-
-				if AABB(bp, en_sh_bullet_box[i][j]) then
-					lifep = lifep-2
-					en_sh_bullet_enabled[i][j] = false
-					if lifep < 0 then
-						game_over = true
-					end
-				end
-			end
- 		end
-	end
-end
+ collision_render_bullet()
  
  collision_jw()
  collision_sp()
@@ -1136,13 +1174,19 @@ end
  wp1_collision()
  wp2_collision()
 
+ render_goal()
+
+ -- UI DISPLAY
+
  -- display life
  rect(10,10,lifep//2,5,2)
  
  -- goal
  --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
-	
- spr(5,220,10,0,1,0,dir_goal_buffer[index_goal],1,1)
+
+ if not goal_enabled then
+ 	spr(5,220,10,0,1,0,dir_goal_buffer[index_goal],1,1)
+ end
 
  -- display score
  spr(261,120,5,0,1,0,0,4,1)
