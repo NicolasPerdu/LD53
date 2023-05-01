@@ -108,6 +108,7 @@ timer_buffer_fare = -1
 
  --ui
  score = 0
+ fare_score = 0
 
  --enemies
  num_en_min=3
@@ -894,25 +895,31 @@ function check_render_timer()
 		game_over = true
 	  end
 	
-	  spr(289,200,5,0,1,0,0,3,1)
+	  local begin_pos = 70
+	  local begin_y = 2
+	  spr(289,begin_pos,begin_y,0,1,0,0,3,1)
 
  	  num5 = rest % 10;
  	  num4 = (rest // 10) % 10;
       num3 = (rest // 100) % 10;
 
-      spr(get_id_number(num3),220,5,0,1,0,0,1,1)
-      spr(get_id_number(num4),228,5,0,1,0,0,1,1)
-      spr(get_id_number(num5),236,5,0,1,0,0,1,1)
+	  begin_pos = begin_pos + 24
+	  
+      spr(get_id_number(num3),begin_pos,begin_y,0,1,0,0,1,1)
+      spr(get_id_number(num4),begin_pos+8,begin_y,0,1,0,0,1,1)
+      spr(get_id_number(num5),begin_pos+16,begin_y,0,1,0,0,1,1)
 	  
 	  --print("time: "..tostring(rest),200,5,0)
 end
 
 function check_render_timer_fare()
-	if timer_buffer_fare > 0 then
+	rest = 0
+	if payload_picked then 
+	 if timer_buffer_fare > 0 then
 		timer_buffer_fare = time()
 	 end
 	
-	 if timer_begin_fare < 0 then 
+	 if not payload_picked then 
 	  timer_begin_fare = time()
 	  timer_buffer_fare = timer_begin_fare
 	 end
@@ -923,7 +930,24 @@ function check_render_timer_fare()
 	  if rest <= 0 then
 		game_over = true
 	  end
-	
+	end
+
+	  local begin_pos = 120
+	  local begin_y = 2
+	  spr(278,begin_pos,begin_y,0,1,0,0,3,1)
+	  begin_pos = begin_pos + 24
+
+	  spr(289,begin_pos,begin_y,0,1,0,0,3,1)
+	  num5 = rest % 10;
+ 	  num4 = (rest // 10) % 10;
+      num3 = (rest // 100) % 10;
+
+	  begin_pos = begin_pos + 24
+	  
+      spr(get_id_number(num3),begin_pos,begin_y,0,1,0,0,1,1)
+      spr(get_id_number(num4),begin_pos+8,begin_y,0,1,0,0,1,1)
+      spr(get_id_number(num5),begin_pos+16,begin_y,0,1,0,0,1,1)
+
 	  --print("time fare: "..tostring(rest),100,5,0)
 end
 
@@ -1137,6 +1161,46 @@ function update_inv_frame()
 	end 
 end
 
+function render_fare_score()
+	begin_x = 2
+	begin_y = 12
+   
+	spr(278,begin_x,begin_y,0,1,0,0,4,1)
+	begin_x = begin_x + 24
+
+	spr(261,begin_x,begin_y,0,1,0,0,4,1)
+
+	num5 = fare_score % 10;
+	num4 = (fare_score // 10) % 10;
+	num3 = (fare_score // 100) % 10;
+	num2 = (fare_score // 1000) % 10;
+	--num1 = (score // 10000) % 10;
+	begin_x = begin_x + 35
+   
+	spr(get_id_number(num2),begin_x, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num3),begin_x + 8, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num4),begin_x + 16, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num5),begin_x + 24, begin_y,0,1,0,0,1,1)
+end
+
+function render_score()
+	begin_x = 2
+	begin_y = 2
+   
+	spr(261,begin_x,begin_y,0,1,0,0,4,1)
+	num5 = score % 10;
+	num4 = (score // 10) % 10;
+	num3 = (score // 100) % 10;
+	num2 = (score // 1000) % 10;
+	--num1 = (score // 10000) % 10;
+	begin_x = begin_x + 35
+   
+	spr(get_id_number(num2),begin_x, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num3),begin_x + 8, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num4),begin_x + 16, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num5),begin_x + 24, begin_y,0,1,0,0,1,1)
+end
+
 function collision_en()
 	for i=1,num_en_sh do
 		if ens_sh_enabled[i] then
@@ -1314,7 +1378,7 @@ render_sky()
  -- UI DISPLAY
 
  -- display life
- rect(10,10,lifep//2,5,2)
+ rect(10,22,lifep//2,5,2)
  
  -- goal
  --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
@@ -1324,16 +1388,8 @@ render_sky()
  end
 
  -- display score
- spr(261,120,5,0,1,0,0,4,1)
- num5 = score % 10;
- num4 = (score // 10) % 10;
- num3 = (score // 100) % 10;
- num2 = (score // 1000) % 10;
- --num1 = (score // 10000) % 10;
- spr(get_id_number(num2),154,5,0,1,0,0,1,1)
- spr(get_id_number(num3),162,5,0,1,0,0,1,1)
- spr(get_id_number(num4),170,5,0,1,0,0,1,1)
- spr(get_id_number(num5),178,5,0,1,0,0,1,1)
+ render_score()
+ render_fare_score()
  --print(tostring(score),154,5, 12)
 
  print("cooldown: "..tostring(sh_auto_delay),5,120, 0)
