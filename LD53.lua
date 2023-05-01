@@ -967,17 +967,16 @@ function check_render_timer()
 	  --print("time: "..tostring(rest),200,5,0)
 end
 
+function render_payload_txt()
+	if payload_picked then
+		spr(288,225,35,0,1,0,0,1,1)
+	end
+end 
+
 function check_render_timer_fare()
 	rest = 0
 	if payload_picked then 
-	 if timer_buffer_fare > 0 then
 		timer_buffer_fare = time()
-	 end
-	
-	 if not payload_picked then 
-	  timer_begin_fare = time()
-	  timer_buffer_fare = timer_begin_fare
-	 end
 	
 	  diff_time_fare = math.floor((timer_buffer_fare-timer_begin_fare)/1000)
 	  rest = time_win_fare-diff_time_fare
@@ -1488,7 +1487,7 @@ render_sky()
  -- goal
  --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
 
- if not goal_enabled then
+ if not goal_enabled and not payload_enabled then
  	spr(5,220,10,0,2,0,dir_goal_buffer[index_goal],1,1)
  end
 
@@ -1501,6 +1500,7 @@ render_sky()
 
  render_speed()
  render_boost()
+ render_payload_txt()
 	
  check_render_timer()
  check_render_timer_fare()
@@ -1547,6 +1547,7 @@ end
 -- 029:00000000f0000000f0000000f0000000f0000000f0000000f0000000f0000000
 -- 030:00000000ffffffff0000000000000000000000000000000000000000ffffffff
 -- 031:000000000000000f0000000f0000000f0000000f0000000f0000000f0000000f
+-- 032:00fff0000f666f000f666f000f666f000f666f000f666f000f666f0000fff000
 -- 033:fffffffffcccccfcfffcfffcfffcfffcfffcfffcfffcfffcffffffff00000000
 -- 034:fffffffffcfffcfcfccfccfcfcfcfcfcfcfffcfcfcfffcfcffffffff00000000
 -- 035:ffffffffccccf000fffff000ccccf000fffff000ccccf000fffff00000000000
