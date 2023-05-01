@@ -1,5 +1,5 @@
--- title:   game title
--- author:  Nicolqs & Jake
+-- title:   Sky Delivery
+-- author:  Nicolas & Jake
 -- desc:    short description
 -- site:    website link
 -- license: MIT License (change this to your license of choice)
@@ -24,6 +24,10 @@ function BOOT()
  y_min=-1
  lifep = 100
  bp = {}
+
+ radius1 = 30
+ radius2 = 20
+ radius3 = 10
 
  max_speed_x = 1
  max_speed_y = 1
@@ -946,8 +950,8 @@ function check_render_timer()
 		game_over = true
 	  end
 	
-	  local begin_pos = 70
-	  local begin_y = 2
+	  local begin_pos = 180
+	  local begin_y = 110
 	  spr(289,begin_pos,begin_y,0,1,0,0,3,1)
 
  	  num5 = rest % 10;
@@ -988,17 +992,14 @@ function check_render_timer_fare()
 	  end
 	end
 
-	  local begin_pos = 120
-	  local begin_y = 2
+	  local begin_pos = 180
+	  local begin_y = 120
 	  spr(278,begin_pos,begin_y,0,1,0,0,3,1)
-	  begin_pos = begin_pos + 24
+	  begin_pos = begin_pos + 28
 
-	  spr(289,begin_pos,begin_y,0,1,0,0,3,1)
 	  num5 = rest % 10;
  	  num4 = (rest // 10) % 10;
       num3 = (rest // 100) % 10;
-
-	  begin_pos = begin_pos + 24
 	  
       spr(get_id_number(num3),begin_pos,begin_y,0,1,0,0,1,1)
       spr(get_id_number(num4),begin_pos+8,begin_y,0,1,0,0,1,1)
@@ -1116,13 +1117,8 @@ end
 function render_payload()
 	if payload_enabled then
 		dist1 = magnitude(x-payload_pos_1[1], y-payload_pos_1[2])
-		radius1 = 30
-
 		dist2 = magnitude(x-payload_pos_2[1], y-payload_pos_2[2])
-		radius2 = 20
-
 		dist3 = magnitude(x-payload_pos_3[1], y-payload_pos_3[2])
-		radius3 = 10
 
 		if dist1 < radius1 then
 			payload_picked = true
@@ -1221,8 +1217,8 @@ function update_inv_frame()
 end
 
 function render_mult_score()
-	begin_x = 70
-	begin_y = 12
+	begin_x = 140
+	begin_y = 0
    
 	spr(273,begin_x,begin_y,0,1,0,0,4,1)
 
@@ -1238,8 +1234,8 @@ function render_mult_score()
 end
 
 function render_fare_score()
-	begin_x = 2
-	begin_y = 12
+	begin_x = 80
+	begin_y = 0
    
 	spr(278,begin_x,begin_y,0,1,0,0,4,1)
 
@@ -1248,7 +1244,7 @@ function render_fare_score()
 	num3 = (fare_score // 100) % 10;
 	num2 = (fare_score // 1000) % 10;
 	--num1 = (score // 10000) % 10;
-	begin_x = begin_x + 35
+	begin_x = begin_x + 28
    
 	spr(get_id_number(num2),begin_x, begin_y,0,1,0,0,1,1)
 	spr(get_id_number(num3),begin_x + 8, begin_y,0,1,0,0,1,1)
@@ -1258,7 +1254,7 @@ end
 
 function render_score()
 	begin_x = 2
-	begin_y = 2
+	begin_y = 0
    
 	spr(261,begin_x,begin_y,0,1,0,0,4,1)
 	num5 = score % 10;
@@ -1379,7 +1375,16 @@ if num_dir == index_goal and not goal_enabled and not payload_enabled then
 		payload_enabled = true
 		payload_pos_1 = {math.random(20, 220), math.random(20, 116)}
 		payload_pos_2 = {math.random(20, 220), math.random(20, 116)}
+
+		while (magnitude(payload_pos_2[1]-payload_pos_1[1], payload_pos_2[2]-payload_pos_1[2]) < (radius1+radius2)) do 
+			payload_pos_2 = {math.random(20, 220), math.random(20, 116)}
+		end
+
 		payload_pos_3 = {math.random(20, 220), math.random(20, 116)}
+
+		while (magnitude(payload_pos_3[1]-payload_pos_1[1], payload_pos_3[2]-payload_pos_1[2]) < (radius1+radius3) or magnitude(payload_pos_3[1]-payload_pos_2[1], payload_pos_3[2]-payload_pos_2[2]) < (radius2+radius3)) do 
+			payload_pos_3 = {math.random(20, 220), math.random(20, 116)}
+		end
 	end
 end
 
@@ -1402,13 +1407,13 @@ render_sky()
  	}
  
  -- input system for the enemy moving
- --collision_en_mv()
+ collision_en_mv()
 
  -- input system for the enemhy shooting
- --collision_en()
+ collision_en()
 
  -- update the bullets and render and collision with player
- --collision_render_bullet()
+ collision_render_bullet()
  
  collision_jw()
  collision_sp()
@@ -1441,8 +1446,8 @@ render_sky()
  -- render the player
 	tri(a,b,c,d,e,f,color)
  
- --render_enemies()
- --render_enemies_sh()
+ render_enemies()
+ render_enemies_sh()
 
  wp1_collision()
  wp2_collision()
@@ -1481,7 +1486,7 @@ end
 -- 002:0000000000c00c0000cccc000c0cc0c00c0000c00c0000c00c0000c000000000
 -- 003:0055550005155150555115555515515555555555555115550515515000555500
 -- 004:200000020303303000444400034cc430034cc430004444000303303020000002
--- 005:002cc20002cccc202cccccc2cc2cc2cc222cc222002cc200002cc200002cc200
+-- 005:00fccf000fccccf0fccccccfccfccfccfffccfff00fccf0000fccf0000fccf00
 -- 006:00000000000ccc0000c00000000c00000000c00000000c0000ccc00000000000
 -- 007:00000000000cccc000c000000c0000000c00000000c00000000cccc000000000
 -- 008:000000000cccccc00cccccc0000cc000000cc000000cc000000cc00000000000
