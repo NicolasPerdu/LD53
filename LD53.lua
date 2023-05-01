@@ -550,9 +550,9 @@ function shooting(xmouse, ymouse)
 		  shoot = true
 	  
 	   -- recoil
-	   recoil=0.1
-	   ax=ax-dirShoot[i][1]*recoil
-	   ay=ay-dirShoot[i][2]*recoil
+	   recoil=2
+	   vx=vx-dirShoot[i][1]*recoil
+	   vy=vy-dirShoot[i][2]*recoil
 	   num_ini_a_x = 0
 	   num_ini_a_y = 0
 	  elseif sh_type==1 then
@@ -562,9 +562,9 @@ function shooting(xmouse, ymouse)
 		  shoot = true
 	  
 	   	  -- recoil
-	   	  recoil=0.5
-	   	  ax=ax-dirShootBig[i][1]*recoil
-	   	  ay=ay-dirShootBig[i][2]*recoil
+	   	  recoil=4
+	   	  vx=vx-dirShootBig[i][1]*recoil
+	   	  vy=vy-dirShootBig[i][2]*recoil
 		  num_ini_a_x = 0
 		  num_ini_a_y = 0
 	  end
@@ -759,7 +759,7 @@ end
 function render_col_big_gun()
 	for i=1,sh_max do
 		if shPosBig[i][1] > 0 then
-			circ(shPosBig[i][1],shPosBig[i][2],5, 12)
+			circ(shPosBig[i][1],shPosBig[i][2],5, 4)
 			
 			bb = {
  	  bx= shPosBig[i][1]-5, 
@@ -1193,7 +1193,7 @@ function collision_render_bullet()
 					   en_sh_bullet_enabled[i][j] = false
 				   end
    
-				   pix(en_sh_bullet_pos[i][j][1], en_sh_bullet_pos[i][j][2], 12)
+				   pix(en_sh_bullet_pos[i][j][1], en_sh_bullet_pos[i][j][2], 4)
 				   -- rectb(en_sh_bullet_box[i][j].bx, en_sh_bullet_box[i][j].by, en_sh_bullet_box[i][j].bw, en_sh_bullet_box[i][j].bh, 2)
    
 				   if AABB(bp, en_sh_bullet_box[i][j]) then
@@ -1480,7 +1480,7 @@ render_sky()
 	render_lf()
 	
  -- render the player
-	tri(a,b,c,d,e,f,color)
+	tri(a,b,c,d,e,f,4)
  
  render_enemies()
  render_enemies_sh()
