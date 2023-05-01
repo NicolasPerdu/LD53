@@ -80,8 +80,8 @@ function BOOT()
  w2_enabled={}
  
  --obstacle
- num_os_min=2
- num_os_max=5
+ num_os_min=0
+ num_os_max=0
  num_os=3
  os_life = {3, 3, 3}
  os_enabled = {true, true, true}
