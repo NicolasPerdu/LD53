@@ -109,12 +109,13 @@ timer_buffer_fare = -1
  --ui
  score = 0
  fare_score = 0
+ mult_score = 1
 
  --enemies
  num_en_min=3
  num_en_max=5
  num_en=3
- ens_enabled ={true, true, true}
+ ens_enabled = {true, true, true}
  en_pos = {{0, 0}, {180, 120}, {30, 94}}
  en_box = {{bx=0,by=0,bw=8,bh=8},
   {bx=180,by=120,bw=8,bh=8},
@@ -630,9 +631,13 @@ end
 		cl_enabled[num_cl] = true
 		cl_pos[num_cl] = {en_sh_pos[j][1], en_sh_pos[j][2]}
 		cl_box[num_cl] =  {bx=en_sh_pos[j][1],by=en_sh_pos[j][2],bw=8,bh=8}
-	end 
-	
+	end
  end 
+
+ function update_score_kill()
+	fare_score = fare_score + mult_score*10
+	mult_score = mult_score + 1 
+end
 
  function render_col_small_gun()
 	for i=1,sh_max do
@@ -668,7 +673,7 @@ end
 						gen_boost(j)
 						ens_enabled[j] = false
      					shPos[i] = {-1,-1}
-						fare_score = fare_score + 1
+						update_score_kill()
     				end 
 			 		shPosBox[i]=bb
 				end
@@ -681,7 +686,7 @@ end
 						gen_boost_sh(j)
 						ens_sh_enabled[j] = false
      					shPos[i] = {-1,-1}
-						fare_score = fare_score + 1
+						update_score_kill()
     				end 
 			 		shPosBox[i]=bb
 				end
@@ -765,7 +770,7 @@ function render_col_big_gun()
 						gen_boost(j)
 	 					ens_enabled[j] = false
 						shPosBig[i] = {-1,-1}
-						fare_score = fare_score + 10
+						update_score_kill()
     				end 
 			 		shPosBigBox[i]=bb
 				end
@@ -778,7 +783,7 @@ function render_col_big_gun()
 						gen_boost_sh(j)
 	 					ens_sh_enabled[j] = false
 						shPosBig[i] = {-1,-1}
-						fare_score = fare_score + 10
+						update_score_kill()
     				end 
 			 		shPosBigBox[i]=bb
 				end
@@ -1146,6 +1151,7 @@ function collision_render_bullet()
 					   		lifep = lifep-2
 							inv_frame = true
 							inv_counter = 0
+							mult_score = 1
 						end
 					   en_sh_bullet_enabled[i][j] = false
 					   if lifep < 0 then
@@ -1168,14 +1174,28 @@ function update_inv_frame()
 	end 
 end
 
+function render_mult_score()
+	begin_x = 70
+	begin_y = 12
+   
+	spr(273,begin_x,begin_y,0,1,0,0,4,1)
+
+	num5 = mult_score % 10;
+	num4 = (mult_score // 10) % 10;
+	num3 = (mult_score // 100) % 10;
+	--num1 = (score // 10000) % 10;
+	begin_x = begin_x + 35
+   
+	spr(get_id_number(num3),begin_x, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num4),begin_x + 8, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num5),begin_x + 16, begin_y,0,1,0,0,1,1)
+end
+
 function render_fare_score()
 	begin_x = 2
 	begin_y = 12
    
 	spr(278,begin_x,begin_y,0,1,0,0,4,1)
-	begin_x = begin_x + 24
-
-	spr(261,begin_x,begin_y,0,1,0,0,4,1)
 
 	num5 = fare_score % 10;
 	num4 = (fare_score // 10) % 10;
@@ -1226,6 +1246,7 @@ function collision_en()
 			  if AABB(bp, en_sh_box[i]) then
 				if not inv_frame then
 			   		lifep = lifep-1
+					mult_score = 1
 					inv_frame = true
 					inv_counter = 0
 				end
@@ -1251,6 +1272,7 @@ function collision_en_mv()
 			   	lifep = lifep-1
 				inv_frame = true
 				inv_counter = 0
+				mult_score = 1
 			   end
 			   if lifep < 0 then
 				   game_over = true
@@ -1397,6 +1419,7 @@ render_sky()
  -- display score
  render_score()
  render_fare_score()
+ render_mult_score()
  --print(tostring(score),154,5, 12)
 
  print("cooldown: "..tostring(sh_auto_delay),5,120, 0)
