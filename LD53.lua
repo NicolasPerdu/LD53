@@ -550,7 +550,7 @@ function shooting(xmouse, ymouse)
 		  shoot = true
 	  
 	   -- recoil
-	   recoil=2
+	   recoil=1.5
 	   vx=vx-dirShoot[i][1]*recoil
 	   vy=vy-dirShoot[i][2]*recoil
 	   num_ini_a_x = 0
@@ -654,8 +654,10 @@ end
  end 
 
  function update_score_kill()
-	fare_score = fare_score + mult_score*10
-	mult_score = mult_score + 1 
+	if payload_picked then 
+		fare_score = fare_score + mult_score*10
+		mult_score = mult_score + 1
+	end
 end
 
  function render_col_small_gun()
