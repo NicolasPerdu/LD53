@@ -1324,6 +1324,31 @@ function collision_en_mv()
 	end
 end
 
+function render_boost()
+	local begin_x = 0
+	local begin_y = 110
+	spr(352,begin_x,begin_y,0,1,0,0,4,1)
+	begin_x = begin_x + 35
+	num5 = sh_auto_delay % 10;
+	num4 = (sh_auto_delay // 10) % 10;
+	spr(get_id_number(num4),begin_x, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(num5),begin_x+8, begin_y,0,1,0,0,1,1)
+	--print("speed: "..tostring(max_speed_x),5,130, 0)
+end
+
+function render_speed()
+	local begin_x = 0
+	local begin_y = 120
+	spr(357,begin_x,begin_y,0,1,0,0,4,1)
+	begin_x = begin_x + 35
+	num = math.floor(max_speed_x)
+	dec = (max_speed_x*10)%10
+	spr(get_id_number(num),begin_x, begin_y,0,1,0,0,1,1)
+	spr(361,begin_x+8, begin_y,0,1,0,0,1,1)
+	spr(get_id_number(dec),begin_x+16, begin_y,0,1,0,0,1,1)
+	--print("speed: "..tostring(max_speed_x),5,130, 0)
+end
+
 function TIC()
 	gen_random_map()
 	
@@ -1458,7 +1483,7 @@ render_sky()
  -- UI DISPLAY
 
  -- display life
- rect(10,22,lifep//2,5,2)
+ rect(10,10,lifep//2,5,2)
  
  -- goal
  --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
@@ -1472,9 +1497,10 @@ render_sky()
  render_fare_score()
  render_mult_score()
  --print(tostring(score),154,5, 12)
+ --print("cooldown: "..tostring(sh_auto_delay),5,120, 0)
 
- print("cooldown: "..tostring(sh_auto_delay),5,120, 0)
- print("speed: "..tostring(max_speed_x),5,130, 0)
+ render_speed()
+ render_boost()
 	
  check_render_timer()
  check_render_timer_fare()
@@ -1575,6 +1601,11 @@ end
 -- 097:ffffffffcccfffccfffcfcfffffcfcfffffcfcffcccfffccffffffff00000000
 -- 098:ffffffffcfffccccfcfcfffffcffcccffcfffffccffcccccffffffff00000000
 -- 099:fffffff0fcccccf0fffcfff0fffcfff0fffcfff0fffcfff0fffffff000000000
+-- 101:fffffffffffccccfffcffffffffcccffffffffcfffccccffffffffff00000000
+-- 102:ffffffffccccffcccfffcfcfccccffcccfffffcfcfffffccffffffff00000000
+-- 103:ffffffffcccfccccffffcfffcccfccccffffcfffcccfccccffffffff00000000
+-- 104:ffffffffcfccccffffcfffcfcfcfffcfffcfffcfcfccccffffffffff00000000
+-- 105:fffffffffffffffffffffffffffffffffffffffffffccffffffccfffffffffff
 -- 107:00000000000fffff00fccccc0fccccccfcccccccccccccccccccccccffffffff
 -- 108:00000000ffffffff6600000066000000660000006600000066000000ffffffff
 -- 109:00000000ffffffff6667000066660000666700006666000066670000ffffffff
