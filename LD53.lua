@@ -15,6 +15,11 @@ function BOOT()
  vy=0
  ax=0
  ay=0
+ anim_index = 1
+ anim_id = {281, 297, 313, 329}
+ anim_enabled = false
+ x_anim = 0
+ y_anim = 0
  num_ini_a_x = 0
  num_ini_a_y = 0
  num_max_a = 7
@@ -207,6 +212,17 @@ function fill_direction_goal()
 	 dir_goal_buffer[i] = math.random(0,3)
 	end
 	dir_goal =  dir_goal_buffer
+end
+
+function render_anim()
+	if anim_enabled then
+		spr(anim_id[anim_index],x_anim,y_anim,0,1,0,0,1,1)
+		anim_index = anim_index + 1
+		if anim_index == 5 then
+			anim_enabled = false
+			anim_index = 0
+		end 
+	end 
 end
 
 function gen_wp()
@@ -548,6 +564,7 @@ function shooting(xmouse, ymouse)
 	 end 
 	
 		if i<sh_max then
+			anim_enabled = true
 		 if sh_type==2 then
 		  sfx (19,14,10,1,15,4) 
 	   dirShoot[i] = norm({xmouse-x, ymouse-y})
@@ -1497,6 +1514,9 @@ render_sky()
 	obstacle_collision()
 
 	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
+
+	x_anim = a
+	y_anim = b 
 	
 	x = x + vx
 	y = y + vy
@@ -1542,6 +1562,7 @@ render_sky()
  --print(tostring(score),154,5, 12)
  --print("cooldown: "..tostring(sh_auto_delay),5,120, 0)
 
+ render_anim()
  render_speed()
  render_boost()
  render_payload_txt()
