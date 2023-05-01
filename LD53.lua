@@ -13,6 +13,11 @@ function BOOT()
  --my=0
  vx=0
  vy=0
+ ax=0
+ ay=0
+ num_ini_a_x = 0
+ num_ini_a_y = 0
+ num_max_a = 7
  x_max=-1
  y_max=-1
  x_min=-1
@@ -20,8 +25,11 @@ function BOOT()
  lifep = 100
  bp = {}
 
- max_speed_x=1
- max_speed_y=1
+ max_speed_x = 1
+ max_speed_y = 1
+
+ max_real_speed_x = 4
+ max_real_speed_y = 4
  
  --map
  map_gen=false
@@ -429,8 +437,10 @@ function collision_sp()
 		if sp_enabled[i] then
 			if AABB(bp, sp_box[i]) then
 				sp_enabled[i]=false
-				max_speed_x = max_speed_x + 0.5
-				max_speed_y = max_speed_y + 0.5
+				max_speed_x = max_speed_x + 0.3
+				max_speed_y = max_speed_y + 0.3
+				max_speed_x = clamp(vx, -max_real_speed_x, max_real_speed_x)
+				max_speed_y = clamp(vy, -max_real_speed_y, max_real_speed_y)
 			end
 		end
 	 end
@@ -844,22 +854,50 @@ function gen_random_map()
 end
 
 function input_system()
+	const_a = 0.05
 	if btn(0) then
-		vy=vy-0.2
+		if ay == 0 then
+			ay=ay-const_a
+			num_ini_a_y = 0
+		end
 		--	sfx (28,12,-1,0,2,4)
  	end
 	if btn(1) then
-		vy=vy+0.2
+		if ay == 0 then
+			ay=ay+const_a
+			num_ini_a_y = 0
+		end
 		--	sfx (28,12,-1,0,2,4)
  	end
 	if btn(2) then
-	 vx=vx-0.2
+		if ax == 0 then
+	 		ax=ax-const_a
+	 		num_ini_a_x = 0
+		end
 	--	sfx (28,12,-1,0,2,4)
  end
 	if btn(3) then
-	 vx=vx+0.2
+	if ax == 0 then
+	 ax=ax+const_a
+	 num_ini_a_x = 0
+	end
 	--	sfx (28,12,-1,0,2,4)
  end
+
+ 	if num_ini_a_x < num_max_a then
+		num_ini_a_x = num_ini_a_x + 1
+	else
+		ax = 0
+	end
+
+	if num_ini_a_y < num_max_a then
+		num_ini_a_y = num_ini_a_y + 1
+	else
+		ay = 0 
+	end
+
+ 	vx = vx + ax
+	vy = vy + ay
 	
 	if not btn(0) 
 		and not btn(1)
@@ -881,6 +919,9 @@ function input_system()
 		
 	vx = clamp(vx, -max_speed_x, max_speed_x)
 	vy = clamp(vy, -max_speed_y, max_speed_y)
+
+	vx = clamp(vx, -max_real_speed_x, max_real_speed_x)
+	vy = clamp(vy, -max_real_speed_y, max_real_speed_y)
 end
 
 function check_render_timer()
@@ -1413,7 +1454,7 @@ render_sky()
  --print("goal : "..tostring(dir_goal_buffer[index_goal]),200,10)
 
  if not goal_enabled then
- 	spr(5,220,10,0,1,0,dir_goal_buffer[index_goal],1,1)
+ 	spr(5,220,10,0,2,0,dir_goal_buffer[index_goal],1,1)
  end
 
  -- display score
