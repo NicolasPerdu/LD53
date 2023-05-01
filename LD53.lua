@@ -441,7 +441,7 @@ for i=1,num_jw do
 	if jw_enabled[i] then
 		if AABB(bp, jw_box[i]) then
 			jw_enabled[i]=false
-			score = score + 30
+			fare_score = fare_score + 30
 		end
 	end
  end
@@ -668,7 +668,7 @@ end
 						gen_boost(j)
 						ens_enabled[j] = false
      					shPos[i] = {-1,-1}
-						score = score + 1
+						fare_score = fare_score + 1
     				end 
 			 		shPosBox[i]=bb
 				end
@@ -681,7 +681,7 @@ end
 						gen_boost_sh(j)
 						ens_sh_enabled[j] = false
      					shPos[i] = {-1,-1}
-						score = score + 1
+						fare_score = fare_score + 1
     				end 
 			 		shPosBox[i]=bb
 				end
@@ -765,7 +765,7 @@ function render_col_big_gun()
 						gen_boost(j)
 	 					ens_enabled[j] = false
 						shPosBig[i] = {-1,-1}
-						score = score + 10
+						fare_score = fare_score + 10
     				end 
 			 		shPosBigBox[i]=bb
 				end
@@ -778,7 +778,7 @@ function render_col_big_gun()
 						gen_boost_sh(j)
 	 					ens_sh_enabled[j] = false
 						shPosBig[i] = {-1,-1}
-						score = score + 10
+						fare_score = fare_score + 10
     				end 
 			 		shPosBigBox[i]=bb
 				end
@@ -928,7 +928,12 @@ function check_render_timer_fare()
 	  rest = time_win_fare-diff_time_fare
 	
 	  if rest <= 0 then
-		game_over = true
+		score = score - fare_score
+		fare_score = 0
+		type_goal = 1
+		payload_picked = false
+		fill_direction_goal()
+		goal_enabled = false
 	  end
 	end
 
@@ -1107,6 +1112,8 @@ function render_goal()
 		radius = 10
 		if dist < radius then
 			num_goal = num_goal - 1
+			score = score + fare_score
+			fare_score = 0
 			timer_begin = timer_begin + 10000
 			type_goal = 1
 			payload_picked = false
