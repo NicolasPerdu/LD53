@@ -562,7 +562,7 @@ function shooting(xmouse, ymouse)
 		  shoot = true
 	  
 	   	  -- recoil
-	   	  recoil=10
+	   	  recoil=2
 	   	  ax=ax-dirShootBig[i][1]*recoil
 	   	  ay=ay-dirShootBig[i][2]*recoil
 		  num_ini_a_x = 0
@@ -583,7 +583,7 @@ function compute_sprite(angle, px, py, size, color)
  local c = pos_x_scl + size * math_cos(angle + size)
  local d = pos_y_scl + size * math_sin(angle + size)
  local e = pos_x_scl + size * math_cos(angle - size)
-	local f = pos_y_scl + size * math_sin(angle - size)
+ local f = pos_y_scl + size * math_sin(angle - size)
 	
 	x_max = math.max(a,c,e)
 	y_max = math.max(b,d,f)
@@ -834,8 +834,8 @@ function obstacle_collision()
 	  }
 		   
 			if AABB(bp, bos[j]) then
-				vx=-0.5*vx
-				vy=-0.5*vy
+				vx=-vx
+				vy=-vy
 			end
 		end
 	end	
@@ -1429,14 +1429,17 @@ render_sky()
 	--print("angle : "..angle,84,84)
 	
 	a,b,c,d,e,f,color = compute_sprite(math.pi + angleRad, x, y,10, 12)
-	w=x_max-x_min
-	h=y_max-y_min
+	w=(x_max-x_min)/2
+	h=(y_max-y_min)/2
 	
+	margin_col = 5
+	square_x = clamp(w-margin_col, 7, 10)
+	square_y = clamp(h-margin_col, 7, 10)
 	bp = {
- 		bx= x_min, 
-  		by= y_min,
-  		bw= w, 
-  		bh= h 
+ 		bx= x_min+margin_col, 
+  		by= y_min+margin_col,
+  		bw= square_x, 
+  		bh= square_y 
  	}
  
  -- input system for the enemy moving
@@ -1456,7 +1459,7 @@ render_sky()
 
  update_inv_frame()
 	 
- --rectb(x_min, y_min, w, h, 2)
+ rectb(bp.bx, bp.by, bp.bw, bp.bh, 2)
 	
 	-- obstacles collision
 	obstacle_collision()
