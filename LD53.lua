@@ -404,6 +404,7 @@ function collision_cl()
 	for i=1,num_cl do
 		if cl_enabled[i] then
 			if AABB(bp, cl_box[i]) then
+				sfx (48,36,16,3,7,5)
 				cl_enabled[i]=false
 				sh_auto_delay = sh_auto_delay-1
 			end
@@ -412,10 +413,11 @@ function collision_cl()
 	end
 
 	function collision_tm()
-		-- collision with speed boost
+		-- collision with time boost
 		for i=1,num_tm do
 			if tm_enabled[i] then
 				if AABB(bp, tm_box[i]) then
+					sfx (48,36,16,3,7,5)
 					tm_enabled[i]=false
 					timer_begin = timer_begin + 10000
 				end
@@ -428,6 +430,7 @@ function collision_cl()
 			for i=1,num_lf do
 				if lf_enabled[i] then
 					if AABB(bp, lf_box[i]) then
+							sfx (48,36,16,3,7,5)
 						lf_enabled[i]=false
 						lifep = lifep+10
 					end
@@ -440,6 +443,7 @@ function collision_sp()
 	for i=1,num_sp do
 		if sp_enabled[i] then
 			if AABB(bp, sp_box[i]) then
+				sfx (48,36,16,3,7,5)
 				sp_enabled[i]=false
 				max_speed_x = max_speed_x + 0.3
 				max_speed_y = max_speed_y + 0.3
@@ -457,6 +461,7 @@ for i=1,num_jw do
 		if AABB(bp, jw_box[i]) then
 			jw_enabled[i]=false
 			lifep = lifep + 1
+			sfx (48,36,16,3,7,5)
 		end
 	end
  end
@@ -1062,6 +1067,7 @@ for i=1, num_w1 do
 		   }
 	 col_big = AABB(bp, bw1)
 	 if col_big then
+			sfx (48,36,16,3,7,5)
 		 w1_enabled[i]=false
 	  sh_type = 1
 	 end
@@ -1083,6 +1089,7 @@ for i=1, num_w2 do
 		   }
 	 col_small = AABB(bp, bw2)
 	 if col_small then
+			sfx (48,36,16,3,7,5)
 		 w2_enabled[i]=false
 	  sh_type = 2
 	 end
@@ -1819,7 +1826,7 @@ end
 -- 018:07c007c017b017a027903780477057506740773087209710a700c700d700e700f700f700f700f700f700f700f700f700f700f700f700f700f700f700107000000000
 -- 019:0cc00cc01cb01ca02c903c804c705c506c407c308c209c10ac00cc00dc00ec00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00107000000000
 -- 020:85e085d085b085a0859085708570756075507550654065405530553045204520452045105510651075009500b500c500e500f500f500f500f500f500305000000000
--- 021:81e081d081b081a0819081708170715071607170616061605160515041504150414041405130612071109100b100c100e100f100f100f100f100f100105000000e00
+-- 021:81e081d081b081a0819081708170715071607170616061605160515041504150414041405130612071109100b100c100e100f100f100f100f100f100000000000e00
 -- 022:8be08bd08bb08ba08b908b708b707b607b507b506b406b405b305b304b204b204b204b105b106b107b009b00bb00cb00eb00fb00fb00fb00fb00fb00105000000000
 -- 023:8be08bd08bb08ba08b908b708b707b607b507b506b406b405b305b304b204b204b204b105b106b107b009b00bb00cb00eb00fb00fb00fb00fb00fb00105000000000
 -- 028:0d07fd750dd7fdf60d26fd150d05fd040d03fd020d01fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd00fd009800000c0700
