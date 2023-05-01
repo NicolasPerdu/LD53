@@ -747,7 +747,7 @@ end
 			end
 		
 			--rectb(bb.bx, bb.by, bb.bw, bb.bh,2)
-			shPos[i]={shPos[i][1]+ dirShoot[i][1],shPos[i][2]+ dirShoot[i][2]}
+			shPos[i]={shPos[i][1]+dirShoot[i][1] * 2.5,shPos[i][2]+dirShoot[i][2] * 2.5}
  	 		if shPos[i][1]>240 or shPos[i][2]>136 or shPos[i][1]<0 or shPos[i][2]<0 then
     			shPos[i] = {-1,-1}
    			end
