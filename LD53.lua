@@ -71,20 +71,32 @@ function BOOT()
  {bx=200,by=40,bw=8,bh=8},
  {bx=100,by=100,bw=10,bh=10}}
 
+-- payload
+payload_picked = false
+payload_enabled = false
+payload_pos_1 = {math.random(20, 220), math.random(20, 116)}
+payload_pos_2 = {math.random(20, 220), math.random(20, 116)}
+payload_pos_3 = {math.random(20, 220), math.random(20, 116)}
+
+time_win_fare = 100
+timer_begin_fare = -1
+timer_buffer_fare = -1
+
  --goal
  num_goal=3
  goal_pos={}
  goal_enabled=false
- num_dir=5
+ num_dir=3
  dir_goal={}
  dir_goal_buffer={}
  index_goal = 1
-
+ type_goal = 1 -- 1 for payload 2 for goal 
  fill_direction_goal()
 
  time_win = 100
  timer_begin = -1 
  timer_buffer = -1
+
  game_win = false
  game_over = false 
 
@@ -870,6 +882,26 @@ function check_render_timer()
 	  print("time: "..tostring(rest),200,5,0)
 end
 
+function check_render_timer_fare()
+	if timer_buffer_fare > 0 then
+		timer_buffer_fare = time()
+	 end
+	
+	 if timer_begin_fare < 0 then 
+	  timer_begin_fare = time()
+	  timer_buffer_fare = timer_begin_fare
+	 end
+	
+	  diff_time_fare = math.floor((timer_buffer_fare-timer_begin_fare)/1000)
+	  rest = time_win_fare-diff_time_fare
+	
+	  if rest <= 0 then
+		game_over = true
+	  end
+	
+	  print("time fare: "..tostring(rest),100,5,0)
+end
+
 function get_id_number(num)
 	def = 440
 
@@ -976,6 +1008,50 @@ for j=1, num_os do
    end
 end 
 
+function render_payload()
+	if payload_enabled then
+		dist1 = magnitude(x-payload_pos_1[1], y-payload_pos_1[2])
+		radius1 = 30
+
+		dist2 = magnitude(x-payload_pos_2[1], y-payload_pos_2[2])
+		radius2 = 20
+
+		dist3 = magnitude(x-payload_pos_3[1], y-payload_pos_3[2])
+		radius3 = 10
+
+		if dist1 < radius1 then
+			payload_picked = true
+			timer_begin_fare = time()
+			time_win_fare = 90
+			type_goal = 2
+			fill_direction_goal()
+			payload_enabled = false
+		end
+
+		if dist2 < radius2 then
+			payload_picked = true
+			timer_begin_fare = time()
+			time_win_fare = 60
+			type_goal = 2
+			fill_direction_goal()
+			payload_enabled = false
+		end
+
+		if dist3 < radius3 then
+			payload_picked = true
+			timer_begin_fare = time()
+			time_win_fare = 30
+			type_goal = 2
+			fill_direction_goal()
+			payload_enabled = false
+		end
+
+		circb(payload_pos_1[1], payload_pos_1[2], radius1, 5)
+		circb(payload_pos_2[1], payload_pos_2[2], radius2, 3)
+		circb(payload_pos_3[1], payload_pos_3[2], radius3, 2)
+	end
+end
+
 function render_goal()
 	if goal_enabled then
 		dist = magnitude(x-goal_pos[1], y-goal_pos[2])
@@ -983,6 +1059,8 @@ function render_goal()
 		if dist < radius then
 			num_goal = num_goal - 1
 			timer_begin = timer_begin + 10000
+			type_goal = 1
+			payload_picked = false
 			fill_direction_goal()
 			goal_enabled = false
 		end 
@@ -1107,9 +1185,16 @@ if game_over then
 	return
 end
 
-if num_dir == index_goal and not goal_enabled then
-	goal_pos = {math.random(20, 220), math.random(20, 116)}
-	goal_enabled = true
+if num_dir == index_goal and not goal_enabled and not payload_enabled then
+	if payload_picked then
+		goal_pos = {math.random(20, 220), math.random(20, 116)}
+		goal_enabled = true
+	else
+		payload_enabled = true
+		payload_pos_1 = {math.random(20, 220), math.random(20, 116)}
+		payload_pos_2 = {math.random(20, 220), math.random(20, 116)}
+		payload_pos_3 = {math.random(20, 220), math.random(20, 116)}
+	end
 end
 
 render_sky()
@@ -1131,13 +1216,13 @@ render_sky()
  	}
  
  -- input system for the enemy moving
- collision_en_mv()
+ --collision_en_mv()
 
  -- input system for the enemhy shooting
- collision_en()
+ --collision_en()
 
  -- update the bullets and render and collision with player
- collision_render_bullet()
+ --collision_render_bullet()
  
  collision_jw()
  collision_sp()
@@ -1168,12 +1253,13 @@ render_sky()
  -- render the player
 	tri(a,b,c,d,e,f,color)
  
- render_enemies()
- render_enemies_sh()
+ --render_enemies()
+ --render_enemies_sh()
 
  wp1_collision()
  wp2_collision()
 
+ render_payload()
  render_goal()
 
  -- UI DISPLAY
@@ -1205,6 +1291,7 @@ render_sky()
  print("speed: "..tostring(max_speed_x),5,130, 0)
 	
  check_render_timer()
+ check_render_timer_fare()
 
 end
 
