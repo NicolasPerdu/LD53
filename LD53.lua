@@ -456,7 +456,7 @@ for i=1,num_jw do
 	if jw_enabled[i] then
 		if AABB(bp, jw_box[i]) then
 			jw_enabled[i]=false
-			lifep = lifep + 20
+			lifep = lifep + 1
 		end
 	end
  end
@@ -1203,7 +1203,7 @@ function collision_render_bullet()
    
 				   if AABB(bp, en_sh_bullet_box[i][j]) then
 						if not inv_frame then
-					   		lifep = lifep-2
+					   		lifep = lifep-1
 							inv_frame = true
 							inv_counter = 0
 							mult_score = 1
@@ -1300,7 +1300,7 @@ function collision_en()
    
 			  if AABB(bp, en_sh_box[i]) then
 				if not inv_frame then
-			   		lifep = lifep-1
+			   		lifep = lifep-2
 					mult_score = 1
 					inv_frame = true
 					inv_counter = 0
