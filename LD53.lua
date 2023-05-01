@@ -53,6 +53,9 @@ function BOOT()
  dirShoot={}
  shPos={}
  shPosBox={}
+
+ --SCN
+ prevSCN=0
  
  --heavy weapon with recoil
  dirShootBig={}
@@ -120,6 +123,9 @@ timer_buffer_fare = -1
  time_win = 100
  timer_begin = -1 
  timer_buffer = -1
+
+ taking_damage = false
+ cntTake = 0
 
  game_win = false
  game_over = false 
@@ -1017,7 +1023,21 @@ function render_payload_txt()
 	if payload_picked then
 		spr(288,225,35,0,1,0,0,1,1)
 	end
-end 
+end
+
+function SCN(y)
+	if taking_damage then
+	 if cntTake < 500 then
+		 prevSCN=math.random(-4,4)
+	 	 poke(0x3FF9, prevSCN)
+	  	cntTake = cntTake + 1
+	 else
+		 cntTake = 0
+	  		poke(0x3FF9,0)
+		 taking_damage = false
+	 end
+	end
+end
 
 function check_render_timer_fare()
 	rest = 0
@@ -1253,6 +1273,7 @@ function collision_render_bullet()
 				   if AABB(bp, en_sh_bullet_box[i][j]) then
 						if not inv_frame then
 					   		lifep = lifep-1
+							taking_damage = true
 							inv_frame = true
 							inv_counter = 0
 							mult_score = 1
@@ -1350,6 +1371,7 @@ function collision_en()
 			  if AABB(bp, en_sh_box[i]) then
 				if not inv_frame then
 			   		lifep = lifep-2
+					taking_damage = true
 					mult_score = 1
 					inv_frame = true
 					inv_counter = 0
