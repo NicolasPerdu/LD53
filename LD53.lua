@@ -864,28 +864,28 @@ end
 
 function input_system()
 	const_a = 0.05
-	if btn(0) then
+	if key(23) then
 		if ay == 0 then
 			ay=ay-const_a
 			num_ini_a_y = 0
 		end
 		--	sfx (28,12,-1,0,2,4)
  	end
-	if btn(1) then
+	if key(19) then
 		if ay == 0 then
 			ay=ay+const_a
 			num_ini_a_y = 0
 		end
 		--	sfx (28,12,-1,0,2,4)
  	end
-	if btn(2) then
+	if key(01) then
 		if ax == 0 then
 	 		ax=ax-const_a
 	 		num_ini_a_x = 0
 		end
 	--	sfx (28,12,-1,0,2,4)
  end
-	if btn(3) then
+	if key(04) then
 	if ax == 0 then
 	 ax=ax+const_a
 	 num_ini_a_x = 0
@@ -908,10 +908,10 @@ function input_system()
  	vx = vx + ax
 	vy = vy + ay
 	
-	if not btn(0) 
-		and not btn(1)
-		and not btn(2)
-		and not btn(3) then 
+	if not key(23) 
+		and not key(19)
+		and not key(01)
+		and not key(04) then 
 		cst = 0.05
 		if vx>0 then
 		 vx = math.max(0, vx - cst)
