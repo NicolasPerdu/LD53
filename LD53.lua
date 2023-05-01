@@ -439,8 +439,8 @@ function collision_sp()
 				sp_enabled[i]=false
 				max_speed_x = max_speed_x + 0.3
 				max_speed_y = max_speed_y + 0.3
-				max_speed_x = clamp(vx, -max_real_speed_x, max_real_speed_x)
-				max_speed_y = clamp(vy, -max_real_speed_y, max_real_speed_y)
+				max_speed_x = clamp(max_speed_x, -max_real_speed_x, max_real_speed_x)
+				max_speed_y = clamp(max_speed_y, -max_real_speed_y, max_real_speed_y)
 			end
 		end
 	 end
@@ -546,18 +546,23 @@ function shooting(xmouse, ymouse)
 		  shoot = true
 	  
 	   -- recoil
-	   x=x-dirShoot[i][1]
-	   y=y-dirShoot[i][2]
+	   recoil=0.1
+	   ax=ax-dirShoot[i][1]*recoil
+	   ay=ay-dirShoot[i][2]*recoil
+	   num_ini_a_x = 0
+	   num_ini_a_y = 0
 	  elseif sh_type==1 then
 		  sfx (19,14,10,1,15,4)
-	   dirShootBig[i] = norm({xmouse-x, ymouse-y})
+	   	  dirShootBig[i] = norm({xmouse-x, ymouse-y})
 		  shPosBig[i] = {x, y}
 		  shoot = true
 	  
-	   -- recoil
-	   recoil=4
-	   x=x-dirShootBig[i][1]*recoil
-	   y=y-dirShootBig[i][2]*recoil
+	   	  -- recoil
+	   	  recoil=10
+	   	  ax=ax-dirShootBig[i][1]*recoil
+	   	  ay=ay-dirShootBig[i][2]*recoil
+		  num_ini_a_x = 0
+		  num_ini_a_y = 0
 	  end
 		end
 	end
@@ -1397,13 +1402,13 @@ render_sky()
  	}
  
  -- input system for the enemy moving
- collision_en_mv()
+ --collision_en_mv()
 
  -- input system for the enemhy shooting
- collision_en()
+ --collision_en()
 
  -- update the bullets and render and collision with player
- collision_render_bullet()
+ --collision_render_bullet()
  
  collision_jw()
  collision_sp()
@@ -1436,8 +1441,8 @@ render_sky()
  -- render the player
 	tri(a,b,c,d,e,f,color)
  
- render_enemies()
- render_enemies_sh()
+ --render_enemies()
+ --render_enemies_sh()
 
  wp1_collision()
  wp2_collision()
