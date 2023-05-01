@@ -16,6 +16,7 @@ function BOOT()
  ax=0
  ay=0
  anim_index = 1
+ anim_counter = 0
  anim_id = {281, 297, 313, 329}
  anim_enabled = false
  x_anim = 0
@@ -216,12 +217,16 @@ end
 
 function render_anim()
 	if anim_enabled then
-		spr(anim_id[anim_index],x_anim,y_anim,0,1,0,0,1,1)
-		anim_index = anim_index + 1
+		spr(anim_id[anim_index],x_anim - 4,y_anim - 4,0,1,0,0,1,1)
+		if anim_counter > 2 then
+				anim_index = anim_index + 1
+				anim_counter = 0
+			end
 		if anim_index == 5 then
 			anim_enabled = false
 			anim_index = 0
-		end 
+		end
+		anim_counter = anim_counter + 1 
 	end 
 end
 
@@ -1607,7 +1612,7 @@ end
 -- 022:ffffffffcccccffccfffffcfcccccfcccfffffcfcfffffcfffffffff00000000
 -- 023:ffffffffccffccccffcfcfffcccfccccffcfcffcffcfcfffffffffff00000000
 -- 024:ffffffffffcccccfcfcfffffffcccccfffcfffffcfcccccfffffffff00000000
--- 025:00000000000c0000000cc00000ccccc00ccccc00000cc0000000c00000000000
+-- 025:0000000000030000000330000033333003333300000330000000300000000000
 -- 027:0000000f0000000f0000000f0000000f0000000f0000000f0000000f00000000
 -- 029:00000000f0000000f0000000f0000000f0000000f0000000f0000000f0000000
 -- 030:00000000ffffffff0000000000000000000000000000000000000000ffffffff
@@ -1620,7 +1625,7 @@ end
 -- 038:00000000fffffffffcffffccccfffcfffcfffcfffcfffcfffcfcffccffffffff
 -- 039:00000000ffffffffccfcfffcfffcfffcccfcfffcfcfcfffcccffcccfffffffff
 -- 040:00000000fffffff0fcfffcf0fccffcf0fcfcfcf0fcffccf0fcfffcf0fffffff0
--- 041:c000000c0c0cc0c000c00c000c0cc0c00c0cc0c000c00c000c0cc0c0c000000c
+-- 041:3000000303033030003003000303303003033030003003000303303030000003
 -- 042:ffffffff000000000000000000000000000000000000000000000000ffffffff
 -- 043:00000000ffffffffccccccccccccccccccccccccccccccccccccccccffffffff
 -- 044:00000000ffffffffaa000000aa000000aa000000aa000000aa000000ffffffff
@@ -1635,7 +1640,7 @@ end
 -- 054:00000000ffffffffccffffccfffffcffcffffcfffcfffcffcffcffccffffffff
 -- 055:00000000ffffffffccfcfffcfffcfffcccfcfffcfcfcfffcccffcccfffffffff
 -- 056:00000000fffffff0fcfffcf0fccffcf0fcfcfcf0fcffccf0fcfffcf0fffffff0
--- 057:000cc0000c0000c000000000c000000cc000000c000000000c0000c0000cc000
+-- 057:0003300003000030000000003000000330000003000000000300003000033000
 -- 059:00000000ffffffffcccccc00cccccc00cccccc00cccccc00cccccc00ffffffff
 -- 060:00000000ffffffff9900000099000000990000009900000099000000ffffffff
 -- 061:00000000ffffffff999a000099990000999a000099990000999a0000ffffffff
@@ -1648,7 +1653,7 @@ end
 -- 070:00000000ffffffffccccfcfffffffcfffffffcccfffffcffccccfcffffffffff
 -- 071:00000000fffffffffcfccccccffcfffffffccccccffcfffffcfcccccffffffff
 -- 072:00000000fffffff0fcccccf0fffcfff0fffcfff0fffcfff0fffcfff0fffffff0
--- 073:c000000c0000000000000000000cc000000cc0000000000000000000c000000c
+-- 073:3000000300000000000000000003300000033000000000000000000030000003
 -- 075:00000000ffffffffcccc0000cccc0000cccc0000cccc0000cccc0000ffffffff
 -- 076:00000000ffffffff8800000088000000880000008800000088000000ffffffff
 -- 077:00000000ffffffff8889000088880000888900008888000088890000ffffffff
