@@ -25,6 +25,8 @@ function BOOT()
  
  --map
  map_gen=false
+ margin = 10
+ margin_ob = 50
  
   --bgm
 -- music(0,0,0,true,true)
@@ -38,6 +40,10 @@ function BOOT()
  dirShootBig={}
  shPosBig={}
  shPosBigBox={}
+
+ inv_frame = false
+ inv_counter = 0
+ inv_counter_max = 30
  
  sh_max = 100
  for i=1,sh_max do
@@ -200,12 +206,12 @@ function gen_wp()
  
  for i=1, num_w1 do
   w1_enabled[i]=true
-  w1_pos[i]={rd(1,240),rd(1,136)}
+  w1_pos[i]={rd(1+margin,240),rd(1+margin,136-margin)}
  end
  
  for i=1, num_w2 do
   w2_enabled[i]=true
-  w2_pos[i]={rd(1,240),rd(1,136)}
+  w2_pos[i]={rd(1+margin,240-margin),rd(1+margin,136-margin)}
  end
 end
 
@@ -217,7 +223,7 @@ local rd = math.random
  jw_box={}
  for i=1, num_jw do
   jw_enabled[i]=true
-  jw_pos[i]={rd(1,240), rd(1,136)}
+  jw_pos[i]={rd(1+margin,240-margin), rd(1+margin,136-margin)}
   jw_box[i]={bx=jw_pos[i][1],by=jw_pos[i][2],bw=8,bh=8}
  end
 end 
@@ -231,8 +237,17 @@ function gen_ob()
 	for i=1, num_os do
 		os_enabled[i]=true
 		os_life[i]=3
-		bos[i]={bx=rd(1,240),
-		        by=rd(1,136),
+
+		--x_ob = 0
+		--y_ob = 0
+		-- if x > 200 and x < 240 then -- right
+			-- x_ob = rd(1+margin,240-margin)
+		-- else if x > 0 and x < 40 then -- left
+		-- else if y > 0 and y < 40 then -- top
+		-- else if y > 100 and x < 136 then -- bottom
+
+		bos[i]={bx=rd(1+margin_ob,240-margin_ob),
+		        by=rd(1+margin_ob,136-margin_ob),
 		        bw=rd(5,30),
 		        bh=rd(5,30)}
 	end
@@ -254,10 +269,10 @@ function gen_en_sh()
 	for i=1, num_en_sh do
 		ens_sh_enabled[i]=true
 		en_sh_delay_shooting[i]=0
-		en_sh_pos[i]={rd(1,240),rd(1,136)}
+		en_sh_pos[i]={rd(1+margin,240-margin),rd(1+margin,136-margin)}
 		val=magnitude(x-en_sh_pos[i][1], y-en_sh_pos[i][2])
 		while (val < 30) do
-			en_sh_pos[i]={rd(1,240),rd(1,136)}
+			en_sh_pos[i]={rd(1+margin,240-margin),rd(1+margin,136-margin)}
 			val=magnitude(x-en_sh_pos[i][1], y-en_sh_pos[i][2])
 		end
 		en_sh_box[i]={bx=en_sh_pos[i][1],
@@ -282,10 +297,10 @@ function gen_en()
 	
 	for i=1, num_en do
 		ens_enabled[i]=true
-		en_pos[i]={rd(1,240),rd(1,136)}
+		en_pos[i]={rd(1+margin,240-margin),rd(1+margin,136-margin)}
 		val=magnitude(x-en_pos[i][1], y-en_pos[i][2])
 		while (val < 20) do
-			en_pos[i]={rd(1,240),rd(1,136)}
+			en_pos[i]={rd(1+margin,240-margin),rd(1+margin,136-margin)}
 			val=magnitude(x-en_pos[i][1], y-en_pos[i][2])
 		end
 		en_box[i]={bx=en_pos[i][1],
@@ -425,7 +440,7 @@ for i=1,num_jw do
 	if jw_enabled[i] then
 		if AABB(bp, jw_box[i]) then
 			jw_enabled[i]=false
-			score = score + 3
+			score = score + 30
 		end
 	end
  end
@@ -749,7 +764,7 @@ function render_col_big_gun()
 						gen_boost(j)
 	 					ens_enabled[j] = false
 						shPosBig[i] = {-1,-1}
-						score = score + 1
+						score = score + 10
     				end 
 			 		shPosBigBox[i]=bb
 				end
@@ -762,7 +777,7 @@ function render_col_big_gun()
 						gen_boost_sh(j)
 	 					ens_sh_enabled[j] = false
 						shPosBig[i] = {-1,-1}
-						score = score + 1
+						score = score + 10
     				end 
 			 		shPosBigBox[i]=bb
 				end
@@ -879,7 +894,17 @@ function check_render_timer()
 		game_over = true
 	  end
 	
-	  print("time: "..tostring(rest),200,5,0)
+	  spr(289,200,5,0,1,0,0,3,1)
+
+ 	  num5 = rest % 10;
+ 	  num4 = (rest // 10) % 10;
+      num3 = (rest // 100) % 10;
+
+      spr(get_id_number(num3),220,5,0,1,0,0,1,1)
+      spr(get_id_number(num4),228,5,0,1,0,0,1,1)
+      spr(get_id_number(num5),236,5,0,1,0,0,1,1)
+	  
+	  --print("time: "..tostring(rest),200,5,0)
 end
 
 function check_render_timer_fare()
@@ -899,7 +924,7 @@ function check_render_timer_fare()
 		game_over = true
 	  end
 	
-	  print("time fare: "..tostring(rest),100,5,0)
+	  --print("time fare: "..tostring(rest),100,5,0)
 end
 
 function get_id_number(num)
@@ -1086,7 +1111,11 @@ function collision_render_bullet()
 				   -- rectb(en_sh_bullet_box[i][j].bx, en_sh_bullet_box[i][j].by, en_sh_bullet_box[i][j].bw, en_sh_bullet_box[i][j].bh, 2)
    
 				   if AABB(bp, en_sh_bullet_box[i][j]) then
-					   lifep = lifep-2
+						if not inv_frame then
+					   		lifep = lifep-2
+							inv_frame = true
+							inv_counter = 0
+						end
 					   en_sh_bullet_enabled[i][j] = false
 					   if lifep < 0 then
 						   game_over = true
@@ -1096,6 +1125,16 @@ function collision_render_bullet()
 			end
 	   end
    end
+end
+
+function update_inv_frame()
+	if inv_frame then
+		inv_counter = inv_counter + 1
+		if inv_counter == inv_counter_max then
+			inv_frame = false
+			inv_counter = 0
+		end
+	end 
 end
 
 function collision_en()
@@ -1114,7 +1153,11 @@ function collision_en()
 		   end
    
 			  if AABB(bp, en_sh_box[i]) then
-			   lifep = lifep-1
+				if not inv_frame then
+			   		lifep = lifep-1
+					inv_frame = true
+					inv_counter = 0
+				end
 			   if lifep < 0 then
 				   game_over = true
 			   end
@@ -1133,7 +1176,11 @@ function collision_en_mv()
 			  en_box[i].by=en_pos[i][2]
 	 
 			  if AABB(bp, en_box[i]) then
-			   lifep= lifep-1
+			   if not inv_frame then
+			   	lifep = lifep-1
+				inv_frame = true
+				inv_counter = 0
+			   end
 			   if lifep < 0 then
 				   game_over = true
 			   end
@@ -1216,19 +1263,21 @@ render_sky()
  	}
  
  -- input system for the enemy moving
- --collision_en_mv()
+ collision_en_mv()
 
  -- input system for the enemhy shooting
- --collision_en()
+ collision_en()
 
  -- update the bullets and render and collision with player
- --collision_render_bullet()
+ collision_render_bullet()
  
  collision_jw()
  collision_sp()
  collision_cl()
  collision_tm()
  collision_lf()
+
+ update_inv_frame()
 	 
  --rectb(x_min, y_min, w, h, 2)
 	
@@ -1253,8 +1302,8 @@ render_sky()
  -- render the player
 	tri(a,b,c,d,e,f,color)
  
- --render_enemies()
- --render_enemies_sh()
+ render_enemies()
+ render_enemies_sh()
 
  wp1_collision()
  wp2_collision()
