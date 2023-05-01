@@ -456,7 +456,7 @@ for i=1,num_jw do
 	if jw_enabled[i] then
 		if AABB(bp, jw_box[i]) then
 			jw_enabled[i]=false
-			fare_score = fare_score + 30
+			lifep = lifep + 20
 		end
 	end
  end
@@ -624,7 +624,7 @@ function compute_sprite(angle, px, py, size, color)
 end 
 
  function gen_boost(j)
-	ch = math.random(1, 2)
+	ch = math.random(2, 2)
 	if(ch == 1) then 
 		num_sp = num_sp + 1				
 		sp_enabled[num_sp] = true
