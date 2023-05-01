@@ -1,5 +1,5 @@
--- title:   Sky Delivery
--- author:  Nicolas & Jake
+-- title:   Sky Package Assault
+-- author:  Nicolas Perdu & Iakov Kyriacou-Smith
 -- desc:    short description
 -- site:    website link
 -- license: MIT License (change this to your license of choice)
@@ -1132,6 +1132,7 @@ function render_payload()
 
 		if dist1 < radius1 then
 			payload_picked = true
+			sfx (48,48,16,3,7,5)
 			timer_begin_fare = time()
 			time_win_fare = 90
 			type_goal = 1
@@ -1141,6 +1142,7 @@ function render_payload()
 
 		if dist2 < radius2 then
 			payload_picked = true
+			sfx (48,48,16,3,7,5)
 			timer_begin_fare = time()
 			time_win_fare = 60
 			type_goal = 2
@@ -1150,6 +1152,7 @@ function render_payload()
 
 		if dist3 < radius3 then
 			payload_picked = true
+			sfx (48,48,16,3,7,5)
 			timer_begin_fare = time()
 			time_win_fare = 30
 			type_goal = 3
@@ -1168,6 +1171,7 @@ function render_goal()
 		dist = magnitude(x-goal_pos[1], y-goal_pos[2])
 		radius = 10
 		if dist < radius then
+		
 			num_goal = num_goal - 1
 			
 			if type_goal == 1 then
@@ -1177,6 +1181,8 @@ function render_goal()
 			elseif type_goal == 3 then
 				fare_score = fare_score + 1000
 			end
+			
+			sfx (48,60,16,3,7,5)
 
 			score = score + fare_score 
 			fare_score = 0
@@ -1531,15 +1537,15 @@ render_sky()
 end
 
 -- <TILES>
--- 001:eeeeeee0eccccee0eceeece0eccccee0eceecee0eceeece0eeeeeee000000000
--- 002:eeeeeee0eceeece0eccecce0ececece0eceeece0eceeece0eeeeeee000000000
+-- 001:eeeeeee0e4444ee0e4eee4e0e4444ee0e4ee4ee0e4eee4e0eeeeeee000000000
+-- 002:eeeeeee0e4eee4e0e44e44e0e4e4e4e0e4eee4e0e4eee4e0eeeeeee000000000
 -- 003:00ffff000f2222f0f22cc22ff2c22c2ff2c22c2ff22cc22f0f2222f000ffff00
 -- 004:700000070606606000555500065cc560065cc560005555000606606070000007
 -- 005:00ffff000ff56ff0ff5666fff5f56f6ffff66fff00f56f0000f66f0000ffff00
--- 006:eeeeeee0eecccce0eceeeee0eecccee0eeeeece0eccccee0eeeeeee000000000
--- 007:eeeeeee0eecccce0eceeeee0eceeeee0eceeeee0eecccce0eeeeeee000000000
--- 008:eeeeeee0eccccce0eeeceee0eeeceee0eeeceee0eeeceee0eeeeeee000000000
--- 009:eeeeeee0eceeeee0eceeeee0eceeeee0eceeeee0eccccce0eeeeeee000000000
+-- 006:eeeeeee0ee4444e0e4eeeee0ee444ee0eeeee4e0e4444ee0eeeeeee000000000
+-- 007:eeeeeee0ee4444e0e4eeeee0e4eeeee0e4eeeee0ee4444e0eeeeeee000000000
+-- 008:eeeeeee0e44444e0eee4eee0eee4eee0eee4eee0eee4eee0eeeeeee000000000
+-- 009:eeeeeee0e4eeeee0e4eeeee0e4eeeee0e4eeeee0e44444e0eeeeeee000000000
 -- 017:0020020000200200002ff2000f2cc2f00fc22cf00fc22cf0f22cc22ff222222f
 -- </TILES>
 
@@ -1828,6 +1834,7 @@ end
 -- 045:0cf70cf70cf79c77cc20dc10ec00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00f8b000000000
 -- 046:8c000c00ac004c00dc008c00ec00ec00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc0071b000000000
 -- 047:0c002c005c008c00ac00dc00dc00ec00ec00ec00ec00ec00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc00fc0010b000000000
+-- 048:0500050005000500057005700570057005c005c005c005c005c005c005c005c0f500f500f500f500f500f500f500f500f500f500f500f500f500f500400000000000
 -- </SFX>
 
 -- <PATTERNS>
