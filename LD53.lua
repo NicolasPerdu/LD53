@@ -798,7 +798,8 @@ function render_col_big_gun()
 			for j=1,num_en do
 				if ens_enabled[j] then
     				-- collision bullet enemies
-    				if AABB(bb, en_box[j]) then 
+    				if AABB(bb, en_box[j]) then
+      sfx (28,25,16,2,7,5)  
 						gen_boost(j)
 	 					ens_enabled[j] = false
 						shPosBig[i] = {-1,-1}
@@ -811,7 +812,8 @@ function render_col_big_gun()
 			for j=1,num_en_sh do
 				if ens_sh_enabled[j] then
     				-- collision bullet enemies
-    				if AABB(bb, en_sh_box[j]) then 
+    				if AABB(bb, en_sh_box[j]) then
+      sfx (28,25,16,2,7,5)  
 						gen_boost_sh(j)
 	 					ens_sh_enabled[j] = false
 						shPosBig[i] = {-1,-1}
