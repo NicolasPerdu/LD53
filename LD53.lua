@@ -562,7 +562,7 @@ function shooting(xmouse, ymouse)
 		  shoot = true
 	  
 	   	  -- recoil
-	   	  recoil=2
+	   	  recoil=0.5
 	   	  ax=ax-dirShootBig[i][1]*recoil
 	   	  ay=ay-dirShootBig[i][2]*recoil
 		  num_ini_a_x = 0
@@ -1520,15 +1520,15 @@ render_sky()
 end
 
 -- <TILES>
--- 001:eeeeeee0eccccee0eceeece0eccccee0eceecee0eceeece0eeeeeee000000000
--- 002:eeeeeee0eceeece0eccecce0ececece0eceeece0eceeece0eeeeeee000000000
+-- 001:000000000ccccc000c0000c00c0000c00ccccc000c000c000c0000c000000000
+-- 002:0000000000c00c0000cccc000c0cc0c00c0000c00c0000c00c0000c000000000
 -- 003:0055550005155150555115555515515555555555555115550515515000555500
 -- 004:200000020303303000444400034cc430034cc430004444000303303020000002
 -- 005:00fccf000fccccf0fccccccfccfccfccfffccfff00fccf0000fccf0000fccf00
--- 006:eeeeeee0eecccce0eceeeee0eecccee0eeeeece0eccccee0eeeeeee000000000
--- 007:eeeeeee0eecccce0eceeeee0eceeeee0eceeeee0eecccce0eeeeeee000000000
--- 008:eeeeeee0eccccce0eeeceee0eeeceee0eeeceee0eeeceee0eeeeeee000000000
--- 009:eeeeeee0eceeeee0eceeeee0eceeeee0eceeeee0eccccce0eeeeeee000000000
+-- 006:00000000000ccc0000c00000000c00000000c00000000c0000ccc00000000000
+-- 007:00000000000cccc000c000000c0000000c00000000c00000000cccc000000000
+-- 008:000000000cccccc00cccccc0000cc000000cc000000cc000000cc00000000000
+-- 009:000000000cc000000cc000000cc000000cc000000cccccc00cccccc000000000
 -- 017:0004400000444400004444000444444004444440044444404444444444444444
 -- </TILES>
 
