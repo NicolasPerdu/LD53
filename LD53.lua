@@ -1396,6 +1396,7 @@ function collision_en_mv()
 			  if AABB(bp, en_box[i]) then
 			   if not inv_frame then
 			   	lifep = lifep-1
+				taking_damage = true
 				inv_frame = true
 				inv_counter = 0
 				mult_score = 1
